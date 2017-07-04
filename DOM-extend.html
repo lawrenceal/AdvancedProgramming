@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" >
+    <title>DOM扩展</title>
+    <style>
+        .newClass{
+            color: #0000ff;
+        }
+
+        .disabled{
+            background-color: #c4c8cc;
+        }
+
+        .div{
+            text-decoration: underline;
+        }
+
+        .div5{
+            font-size: 50px;
+        }
+
+        div{
+            margin: 3px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li></ul>
+    <div class="div">hello</div>
+    <div class="div" name="name">hi</div>
+    <div class="div disabled div1 div2" id="className">className</div>
+    <button id="confirm">确定</button>
+    <div id="innerScript"></div>
+    <table>
+        <tbody>
+        <tr></tr>
+        </tbody>
+    </table>
+    <div id="outerHtml"></div>
+    <div id="insertAdjacentHtml">insertAdjacentHtml</div>
+    <div id="innerText">
+        <div>hello</div>
+        <div>world</div>
+        <p>inner text</p>
+    </div>
+    <div id="intoView" style="height: 100px;margin: 500px 0;">into view</div>
+
+
+    <script>
+        (function(){
+            //selector API level1
+            console.log(document.querySelector("li")); //Document Element类型能够调用 document.querySelector
+            console.log(document.querySelectorAll("li")); //返回NodeList Document DocumentFragment Element 能够调用
+            console.log(document.querySelector("p"));
+            console.log(document.querySelectorAll("p"));
+            try{
+                document.querySelector("asd :");
+            }catch (error){
+                console.log(error);
+            }
+            //selector API level2
+            console.log(document.querySelectorAll("li")[0].webkitMatchesSelector("ul li:nth-child(1)"));
+
+            //元素遍历
+            function iteratorElement(){
+                let list = document.querySelector("ul"),
+                    current = list.firstChild,
+                    result = [];
+
+                while (current !== null){ //TODO 书中 current != list.lastChild 有局限性，最后一个是无效元素才生效
+                   if(current.nodeType == 1){
+                       result.push(current);
+                   }
+                   current = current.nextSibling;
+                }
+                return result;
+            }
+            console.log(iteratorElement());
+
+            //Element traversal IE9+
+            //firstElementChild lastElementChild nextElementSibling previousElementSibling childElementCount
+            function iteratorElement1(){
+                let list = document.querySelector("ul"),
+                    current = list.firstElementChild,
+                    result = [];
+                while (current != null){
+                    result.push(current);
+                    current = current.nextElementSibling;
+                }
+                return result;
+            }
+            console.log(iteratorElement1());
+
+        })();
+
+        //HTML5扩展
+        (function(){
+
+            //TODO 与类有关的扩充
+            //可以通多document和所有的html元素调用该方法  返回HTMLCollection IE9+
+            console.log(document.getElementsByClassName("div"));
+
+            let classElement = document.getElementById("className");
+            /**
+             * 添加class
+             * @param element
+             * @param className
+             */
+            let addClass = (element, className) => {
+                let arr = element.className
+                .split(/\s+/)
+                .filter((item) => item && item == className);
+                if(!arr.length){
+                    element.className += ` ${className}`;
+                }
+            };
+            addClass(classElement, "newClass");
+
+            /**
+             * 删除Class
+             * @param element
+             * @param className
+             */
+            let removeClass = (element, className) =>{
+                element.className = element.className
+                .split(/\s+/)
+                .filter((item) => item && item != className)
+                .join(' ');
+            };
+            removeClass(classElement, "disabled");
+
+            /**
+             * 删除class
+             * @param element
+             * @param className
+             */
+            function removeClass1(element, className)
+            {
+                var arr = element.className.split(/\s+/),
+                    i,
+                    len = arr.length,
+                    index = -1;
+                for(i = 0; i < len; i++)
+                {
+                    if(arr[i] == className){
+                        index = i;
+                        break;
+                    }
+                }
+                arr.splice(index, 1);
+                element.className = arr.join(' ');
+            }
+            removeClass1(classElement, "div");
+
+            //classList
+            console.log(classElement.classList.contains("newClass"));
+            classElement.classList.add("div5");
+            classElement.classList.remove("div2");
+            classElement.classList.toggle("div1");
+
+
+            //TODO 焦点管理
+            document.getElementById("confirm").focus();
+            console.log(document.activeElement);
+            console.log(document.hasFocus());
+
+            /**
+             * 是空对象
+             * @param obj
+             * @returns {boolean}
+             */
+            function isEmptyObject(obj)
+            {
+                for(var name in obj)
+                {
+                    if(obj.hasOwnProperty(name))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            var a = {};
+            console.log(isEmptyObject(a));
+
+
+            //TODO HTMLDocument变化
+            //document.readyState   loading complete
+            console.log(document.readyState); //loading ? 整个页面没有加载完毕
+
+            //document.compatMode CSS1Compat(标准模式) BackCompat(混杂模式)
+            console.log(document.compatMode);
+
+            let head = document.head || document.getElementsByTagName("head")[0];
+            console.log(head);
+
+
+            //TODO 字符集属性
+            console.log("document.charset = " + document.charset);
+
+
+            //TODO 自定义属性
+            let div = document.createElement("div");
+            div.dataset.name = "setName";
+            div.appendChild(document.createTextNode("data set"));
+            document.body.appendChild(div);
+            console.log(div.dataset.name);
+
+
+            //TODO 插入标记 HTML解析器
+            div.innerHTML = "<div class='newClass' id='innerElement'></div>";
+            let innerElement = document.getElementById("innerElement");
+            innerElement.innerHTML = " inner html & <";
+            //读取模式下格式有兼容性，很难做到统一
+            console.log(div.innerHTML); //<div class="newClass" id="innerElement"> inner html &amp; &lt;</div>
+
+            //innerHTML插入script元素不会执行其中的脚本
+            document.getElementById("innerScript").innerHTML = "\<script\>console.log('hello world')\<\/script\>";
+
+            //并不是所有的html元素都支持innerHtml，不支持的有 style table tbody tr thead tfoot ???
+            document.querySelector("table").innerHTML = "<div>hi</div>";
+
+            document.querySelector("#outerHtml").outerHTML = "<div class='newClass'>has set out html</div>";
+
+            let insertAdjacentELement = document.querySelector("#insertAdjacentHtml");
+            //之前同辈
+            insertAdjacentELement.insertAdjacentHTML("beforebegin", "<div>beforebegin</div>");
+            //新的子元素 前插入
+            insertAdjacentELement.insertAdjacentHTML("afterbegin", "<div>afterbegin</div>");
+            //新的子元素 后插入
+            insertAdjacentELement.insertAdjacentHTML("beforeend", "<div>beforeend</div>");
+            //之后同辈
+            insertAdjacentELement.insertAdjacentHTML("afterend", "<div>afterend</div>");
+
+
+            //TODO scrollIntoView方法 手动调用触发 ？
+            document.querySelector("#intoView").scrollIntoView(true); //true 顶部， false 内容尽可能全部出现在
+
+
+        })();
+
+        //专有扩展
+        (function(){
+            //TODO 文档模式 <meta http-equiv="X-UA-Compatible" content="IE=Edge" > 始终以最新的文档模式渲染页面
+            console.log(document.documentMode);//undefined
+
+
+            //TODO children属性 只包含元素子节点
+            console.log(document.querySelector("ul").children); //HTMLCollection
+            console.log(document.querySelector("ul").childNodes); //NodeList
+
+
+            //TODO contains方法
+            console.log(document.body.contains(document.querySelector("ul")));
+
+            //DOM3 compareDocumentPosition 1(无关) 2(前) 4(后) 8(包含) 16(被包含) 20 ？
+            console.log(!!(parseInt(document.body.compareDocumentPosition(document.querySelector("ul")), 8) & 16)); //16 & 16
+            console.log(parseInt(document.body.compareDocumentPosition(document.documentElement), 8)); // 8
+
+            function contains(refNode, otherNode){
+                if(typeof refNode.contains == "function"){
+                    return refNode.contains(otherNode);
+                }else if(typeof refNode.compareDocumentPosition == "function"){
+                    return !!(parseInt(refNode.compareDocumentPosition(otherNode), 8) & 16);
+                }
+            }
+            console.log(contains(document.documentElement, document.body));
+
+
+            //TODO innerText(最新版firefox支持)      textContent(不保留格式)
+            let innerElement = document.querySelector("#innerText");
+            let text = innerElement.innerText || innerElement.textContent;
+            console.log(text);
+            innerElement.innerText = text;
+
+
+            //TODO outText
+
+
+            //TODO 滚动 scrollIntoViewIfNeeded scrollByLines scrollByPages
+
+        })();
+    </script>
+</body>
+</html>

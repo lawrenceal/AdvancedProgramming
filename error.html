@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <script>
+
+        try{
+            var a = {};
+            a.push("a");
+            console.log(a);
+        }catch (error){
+            console.log(error.message);
+            console.log(error.name);
+            console.log(error.stack);
+        }
+
+        function CustomError(message){
+            this.name = "custom error";
+            this.message = message;
+        }
+
+        CustomError.prototype = new Error();
+
+        //throw new CustomError("我是自定义错误类型");
+
+        window.onerror = function(message, url, line){ //  opera 支持
+            console.log("message = " + message + " url = " + url + " line = " + line);
+
+            return false; //貌似并没有作用
+        };
+
+        var f = {};
+        f.push("a");
+
+       /* throw new TypeError("the type is not true");*/
+
+
+
+
+    </script>
+</body>
+</html>

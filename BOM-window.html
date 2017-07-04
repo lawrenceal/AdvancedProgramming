@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=0,5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+    <title>window对象</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="iframe.html" frameborder="0" name="left"></iframe>
+    <iframe src="iframe.html" frameborder="0" name="right"></iframe>
+    <div style="height: 2000px;"></div>
+    <script>
+        (function(window){
+            var color = "blue";
+            window.age = 28;
+            delete color;
+            delete age;
+            console.log(color); //delete var声明的全局对象不能删除(configurable == false)
+            try{
+                console.log(age);
+            }catch (error){
+                console.log(error); //delete能够删除直接在window上定义的属性
+            }
+
+            try{
+                var name = animal; //访问未定义的变量会报错
+            }catch (error){
+                console.log(error);
+            }
+
+            var sex = window.women; //通过window查询未定义的变量不会报错，相当于一次属性查询。
+            console.log(sex);
+
+            console.log("window.name = " + window.name); //TODO 除非最高层窗口是通过open打开的，否则window对象的name属性不会有任何值
+            console.log(top["left"].name);  // top parent self
+        })(window);
+
+        //窗口位置
+        (function(window){
+            let windowLeftPos = (typeof window.screenLeft == "number") ? window.screenLeft : window.screenX;
+            let windowTopPos = (typeof window.screenTop == "number") ? window.screenTop : window.screenY; //统一相对于屏幕的坐标值
+            console.log("window.screenLeft + " + window.screenLeft);
+            console.log("window.screenTop + " + window.screenTop);
+            console.log("window.screenX = " + window.screenX);
+            console.log("window.screenY = " + window.screenY);
+            console.log("windowLeftPos = " + windowLeftPos);
+            console.log("windowTopPos = " + windowTopPos);
+
+            window.moveTo(500,110); //不起作用，被禁止了
+            window.moveBy(-50,-50); //不起作用，被禁止了
+        })(window);
+
+        //窗口大小
+        (function(window){
+            console.log("window.outerHeight = " + window.outerHeight); //不同浏览器处理方式不同 chrome认为是视口， firefox认为是浏览器大小
+            console.log("window.outerWidth = " + window.outerWidth);
+            console.log("window.innerHeight = " + window.innerHeight); //现在统一认为视口的大小（未测试浏览器边框）
+            console.log("window.innerWidth = " + window.innerWidth);
+
+            let pageWidth = window.innerWidth, //视口的宽度
+                pageHeight = window.innerHeight;
+
+            if(typeof pageWidth != 'number'){
+
+                if(document.compatMode == "CSS1Compat"){ //IE6 ？ 标准模式才生效
+                    pageWidth = document.documentElement.clientWidth;
+                    pageHeight = document.documentElement.clientHeight;
+                }else{
+                    pageWidth = document.body.clientWidth;
+                    pageHeight = document.body.clientHeight;
+                }
+            }
+
+            console.log("pageWidth = " + pageWidth);
+            console.log("pageHeight =" + pageHeight);
+
+            //TODO 移动端 （除IE外）document.documentElement.clientWidth 保存的是布局视口。
+            //TODO 移动端  IE document.documentElement.clientWidth（跟随页面缩放）保存的是可见区域的视口(IE不支持window.innerWidth)，IE的布局视口保存在 document.body.clientWidth (不随页面缩放)中。
+
+            //TODO safari window.innerWidth 375  document.documentElement.clientWidth 360 ?
+
+            window.resizeTo(100, 100); //被禁止
+            window.resizeBy(100, 100); //被禁止
+
+
+            //导航和打开窗口
+            //window.open("http://www.caigin.com","left");
+            //let newWindow = window.open("http://www.baidu.com", "newWindow");//打开一个新窗口 name为newWindow _blank name = "";
+
+           /* let newWindow1 = window.open("http://www.baidu.com", "newWindow1","width=600,height=600,top=10,left=10,resizeable=yes");
+            newWindow1.resizeTo(1000,900);
+            newWindow1.moveTo(300,300);
+            newWindow1.close();
+            console.log(newWindow1.closed);
+            console.log(newWindow1.opener); //window 在chrome中opener = null表示在独立的进程中运行新标签。不需要与打开他的标签进行通信*/
+
+            //弹出窗口屏蔽
+            /*let locked = false;
+
+            try{
+                let wroxWin = window.open("http://www.baidu.com");
+                if(wroxWin == null){ //内置程序阻止弹出窗口
+                    locked = true;
+                }
+            }catch (error){ //其他扩展或者程序阻止弹出窗口
+                locked = true;
+            }
+
+            console.log("弹出窗口屏蔽程序 = " + locked);*/
+
+        })(window);
+
+        var timeoutId = 0;
+        //间歇调用和超时调用 在全局作用域中执行的，this指向window,严格模式是下等于undefined
+        (function(){
+
+            //第一参数字符串相当在eval中使用字符串一样
+            setTimeout("console.log('字符串超时调用啊')", 1000);
+
+            setTimeout(function(){
+                console.log("函数超时调用")
+            }, 1000);
+
+            var timeoutId = setTimeout(function(){
+                alert("hello world");
+            }, 1000);
+
+            clearTimeout(timeoutId);//取消尚未执行的超时调用
+
+            function func(){
+                let timeoutId = 1;
+
+                setTimeout(function(){
+                    console.log(this); //window
+                    console.log(timeoutId);
+                    console.log(this.timeoutId);
+                }, 1000);
+
+                setTimeout("console.log(this)", 1000); //window
+            }
+
+            func();
+
+            //间歇调用
+            let num = 0,
+                intervalId = null;
+
+            function incrementNumber(){
+                num ++ ;
+                if(num >= 2){
+                    clearInterval(intervalId);
+                }
+                console.log("间歇调用 " + num);
+            }
+
+            intervalId = setInterval(incrementNumber, 1000);
+
+            //超时调用模拟间歇调用（递归） 避免后一次调用可能会在上一次 "调用结束" 之前启动
+            let num1 = 0;
+            function incrementNumber1(){
+                num1++;
+                if(num1 < 3){
+                    console.log("超时调用模拟间歇调用 " + num1);
+                    setTimeout(incrementNumber1, 1000);
+                }
+            }
+
+            setTimeout(incrementNumber1, 1000);
+
+
+            //系统对话框 1、alert  2、confirm => true or false  3、prompt("文本提示", "默认值") 确定： 文本值 or null
+
+        })();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闭包</title>
+</head>
+<body>
+    <button id="button">click</button>
+    <script>
+        //"use strict";
+        var name = "window name";
+
+        var obj = {
+
+            name: "obj name",
+
+            getNameFunc: function(){
+                return function(){
+                    return this.name;
+                };
+                //return this.name;
+            }
+        };
+
+        console.log(obj.getNameFunc()());
+
+        (function(){
+            var name = "window name";
+
+            var obj = {
+
+                name: "obj name",
+
+                getNameFunc: function(){
+                    var that = this;
+                    return function(){
+                        return that.name;
+                    };
+                }
+            };
+
+            console.log(obj.getNameFunc()());
+        })();
+
+
+        (function(){
+            /**
+             * 闭包只能访问外部函数任何对象的最后一个值
+             * 原因：闭包所保存的是整个变量对象，而不是某个特殊的值
+             * **/
+            function createFunctions(){
+                var result = [];
+                for( var i = 0; i < 10; i++ ){
+                    result[i] = function(){
+                        console.log(i);
+                    }
+                }
+
+                return result;
+            }
+
+            var functions = createFunctions();
+            for(var j = 0; j < functions.length; j++){
+                functions[j]();
+            }
+        })();
+
+        (function(){
+
+            function createFunctions(){
+                var result = [];
+                for( var i = 0; i < 10; i++ ){
+                    result[i] = function(num){
+                        return function(){
+                            console.log(num);
+                        }
+                    }(i);
+                }
+                return result;
+            }
+
+            var functions = createFunctions();
+            for(var j = 0; j < functions.length; j++){
+                functions[j]();
+            }
+
+        })();
+
+        //TODO IE9之前对Jscript和COM对象(引用计数)使用不同的垃圾回收机制
+
+        (function(){
+            var element = document.querySelector("button");
+            element.onclick = function(){
+                console.log(element.id); //FIXME 存在循环引用的危险
+            }
+        })();
+
+        //更好的处理办法
+        (function(){
+            var element = document.querySelector("button");
+            var id = element.id;
+            element.onclick = function(){
+                console.log(id); //FIXME 存在循环引用的危险 保存的是变量对象的指针不是数值
+            };
+            element = null;
+
+            var id; //忽略后面的声明
+
+            console.log(id);
+
+            var id = "button reset"; //会执行后续声明的初始化
+            console.log(id);
+        })();
+
+
+    </script>
+</body>
+</html>

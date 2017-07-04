@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>事件</title>
+</head>
+<body>
+    <form action="" style="padding: 10px;">
+        <input type="text" name="username" value="kitty">
+        <input type="button" onclick="console.log(username.value)" value="确定 username.value">
+        <input type="button" value="确定 event.target" onclick="console.log(event.target)">
+        <input type="button" value="确定" onclick="htmlEventHandler(event)">
+    </form>
+    <div style="margin-top: 10px;padding: 10px;">
+        <button id="submit">提交</button>
+    </div>
+    <div style="margin-top: 10px;padding: 10px;">
+        <button id="cancel">取消</button>
+    </div>
+    <div style="margin-top: 10px;padding: 10px;">
+        <button id="confirm">确定</button>
+    </div>
+    <div style="margin-top: 10px;padding: 10px;" id="eventObj">
+        <button >事件对象</button>
+    </div>
+    <script>
+
+        (function(window){
+            //事件流 事件冒泡 事件捕获 DOM事件流
+
+            //事件处理程序 HTML事件处理程序 TODO 缺点：1.时差 常用try catch  2.代码耦合
+            window.htmlEventHandler = function(event){
+                console.log(event.target);
+            };
+
+            //DOM0级事件处理程序 TODO 优点：简单 兼容
+            //将一个函数赋值给元素的事件处理程序属性  认为是元素的方法，在元素的作用域中执行 this == 当前元素。冒泡阶段处理
+            let submitBtn = document.querySelector("#submit");
+            submitBtn.onclick = function(event){
+                console.log(event.target.innerHTML);
+                console.log(this);
+            };
+            //TODO submitBtn.onclick = null 删除事件处理程序
+
+            //DOM2级事件处理程序 TODO 可以添加多个事件 IE9和其余的浏览器都支持
+            //在元素的作用域中执行
+            let cancelBtn = document.querySelector("#cancel");
+            cancelBtn.addEventListener("click", function(event){
+                console.log(event.target);
+            }, false);// false == 该事件在冒泡阶段被触发
+            cancelBtn.addEventListener("click", function(event){
+                console.log(event.target.tagName);
+            }, false);
+
+            function handler (event){
+                console.log(event.target.innerHTML);
+            }
+            cancelBtn.addEventListener("click", handler, false);
+            cancelBtn.removeEventListener("click", handler, false);
+
+            //IE的事件处理程序 TODO 事件处理程序会在全局作用域中运行 this == window 只支持事件冒泡
+            //可以添加多个事件，但是按照相反的顺序执行，detachEvent删除事件
+            let confirmBtn = document.querySelector("#confirm");
+            try{
+                confirmBtn.attachEvent("onclick", function (event) { // onclick
+                    console.log(event);
+                });
+            }catch (error){
+                console.log("不支持 attachEvent");
+            }
+
+            //跨浏览器的事件处理程序
+
+            let EventUtil = {
+
+                addHandler: function(element, type, handler){
+                    if(element.addEventListener){
+                        element.addEventListener(type, handler, false);
+                    }else if(element.attachEvent){
+                        element.attachEvent("on" + type, handler);
+                    }else{
+                        element["on" + type] = handler;
+                    }
+                },
+
+                removeHandler: function(element, type, handler){
+                    if(element.removeEventListener){
+                        element.removeEventListener(type, handler, false);
+                    }else if(element.detachEvent){
+                        element.detachEvent("on" + type, handler);
+                    }else{
+                        element["on" + type] = null;
+                    }
+                }
+            };
+
+            EventUtil.addHandler(confirmBtn, "click", handler);
+
+            //事件对象
+            let eventObjBtn = document.querySelector("#eventObj");
+            eventObjBtn.addEventListener("click", function(event){
+                console.log("bubbles = " + event.bubbles);
+                console.log("cancelable = " + event.cancelable);
+                if(event.cancelable){
+                    event.preventDefault();
+                }
+                if(event.bubbles){
+                    event.stopPropagation();
+                }
+
+                console.log(event.target);
+                console.log("currentTarget == this = " + (event.currentTarget == this));
+                console.log(this);
+
+                event.stopImmediatePropagation();
+                console.log(event.type);
+                console.log(event.eventPhase);
+                console.log(event);
+
+            }, false);
+
+            //IE中的事件对象
+            //DOM0级方法 event对象作为window对象的一个属性存在. attachEvent方式，既可以通过window访问，也会有一个event对象作为参数
+            //HTML方式则相同
+
+            //跨浏览器的事件对象
+
+            EventUtil.getEvent = function(event){
+                return event ? event : window.event;
+            };
+
+            EventUtil.getTarget = function(event){
+                return event.target || event.srcElement;
+            };
+
+            EventUtil.preventDefault = function(event){
+                if(event.preventDefault){
+                    event.preventDefault();
+                }else{
+                    event.returnValue = false;
+                }
+            };
+
+            EventUtil.stopPropagation = function(event){
+                if(event.stopPropagation){
+                    event.stopPropagation();
+                }else{
+                    event.cancelBubble = true;
+                }
+            };
+
+        })(window);
+    </script>
+
+</body>
+</html>

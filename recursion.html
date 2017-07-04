@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>递归</title>
+</head>
+<body>
+    <script>
+        (function(){
+            /**
+             * 普通递归
+             * **/
+            function factorial(num){
+                if(num <= 1){
+                    return 1;
+                }
+                return num * factorial(num - 1);
+            }
+
+            let result = factorial(5);
+            console.log(result);
+        })();
+
+        (function(){
+            /**
+             * argument.callee避免调用函数名 产生的耦合 非严格模式下
+             * **/
+            function factorial(num){
+                if(num <= 1){
+                    return 1;
+                }
+                return num * arguments.callee(num - 1);
+            }
+
+            let result = factorial(5);
+            console.log(result);
+
+        })();
+
+        (function(){
+            "use strict";
+
+            /**
+             * 严格模式下 argument.callee被禁止，使用命名的函数表达式来替换
+             * **/
+            let factorial = function f(num){
+                if(num <= 1){
+                    return 1;
+                }
+                return num * f(num - 1);
+            };
+
+            let result = factorial(5);
+            console.log(result);
+            console.log(factorial);
+            console.log(factorial.name);
+            //console.log(f); //TODO 访问不到 ？
+
+        })();
+
+        (function(){
+            "use strict";
+
+            /**
+             * 尾调用优化 + 函数参数默认值 + 命名的函数表达式
+             * **/
+            let factorial = (function f(num, total = 1){
+                if(num <= 1){
+                    return total;
+                }
+                return f(num - 1, num * total);
+            });
+
+            let result = factorial(5);
+            console.log(result);
+
+        })();
+    </script>
+</body>
+</html>

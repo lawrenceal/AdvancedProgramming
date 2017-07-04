@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>私有变量</title>
+</head>
+<body>
+    <script>
+
+        (function(){
+            /**
+             * 在函数内部定义特权方法
+             * **/
+            function Person(){
+                let name = "lawrence"; //私有变量
+                let age = 24; //私有变量
+
+                function growUp(){ //私有变量
+                    age++;
+                }
+
+                this.getName = function(){ //特权方法
+                    return name;
+                };
+
+                this.setName = function(n){
+                    name = n;
+                };
+
+                this.grow = function(){
+                    growUp();
+                };
+            }
+
+            console.group("在函数内部定义特权方法");
+
+            let person = new Person();
+            let person1 = new Person();
+            person.grow();
+            console.log(person.getName());
+            person.setName("jade");
+            console.log(person.getName());
+            console.log(person1.getName()); //TODO 私有变量和函数在不同实例上不同
+            console.log(person1.getName == person.getName);
+
+            console.groupEnd();
+        })();
+
+        /**
+         * 静态私有变量
+         * 私有作用域 定义私有变量 用原型模式定义特权方法
+         * 私有变量和函数在不同实例共享 并且共享特权方法，不会创建相同的操作方法
+         * **/
+        (function(){
+            let name = "dog";
+            let age = 4;
+
+            Animal = function(n){ //全局作用域
+                name = n;
+            };
+
+            Animal.prototype.setAge = function(value){
+                age = value;
+            };
+
+            Animal.prototype.getAge = function(){
+                return age;
+            };
+        })();
+
+        console.group("静态私有变量");
+
+        let animal1 = new Animal("cat");
+        let animal2 = new Animal("monkey");
+        console.log(animal1.getAge());
+        animal1.setAge(12);
+        console.log(animal1.getAge());
+        console.log(animal2.getAge());
+        console.log(animal1.getAge == animal2.getAge);
+
+        console.groupEnd();
+
+        /**
+         * 模块模式 为单例创建私有变量和特权方法 js是以对象字面量的形式创建单例对象的
+         * 适用于创建一个对象并且以某些数据初始化，同时还能公开访问这些私有数据的接口
+         * **/
+        let singleton = function () {
+
+            let privateVariable = 1,
+                privateObject = {
+                    name: "private object"
+                };
+
+            let privateFunc = function(){
+                privateVariable++;
+
+                console.log("function privateVariable = " + privateVariable);
+            };
+
+            return {
+                publicVariable: privateVariable, //TODO 立即初始化，保存的是数值类型
+                publicObject: privateObject,
+                publicFunc: function(){
+                    privateFunc();
+                },
+                setValue: function(value){
+                    privateVariable = value;
+                    console.log("set privateVariable = " + privateVariable);
+                },
+                setObject: function(value){
+                    privateObject.name = value;
+                }
+            }
+        }();
+
+        console.group("模块模式");
+
+        singleton.setValue(20);
+        singleton.publicFunc();
+        console.log(singleton.publicObject.name);
+        singleton.setObject("public object");
+        console.log(singleton.publicObject.name);
+        console.log(singleton.publicVariable);
+
+        console.groupEnd();
+
+        /**
+         * 增强的模块模式
+         * 返回对象（单例）必须是某种类型的实例，同时还必须添加某些属性和方法对其加以增强
+         ***/
+        function BaseComponent(){}
+
+        let application = function(){
+
+            let components = [new BaseComponent()];
+
+            let app = new BaseComponent();
+
+            app.setComponent = function(component){
+                if(typeof component == "object"){
+                    components.push(component);
+                }
+            };
+
+            app.getValue = function(){
+                return components.length;
+            };
+
+            return app;
+        }();
+
+        application.setComponent(new BaseComponent());
+        application.setComponent(new BaseComponent());
+        console.log(application.getValue());
+        console.log(application.constructor);
+
+    </script>
+</body>
+</html>

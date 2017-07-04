@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM-操作技术</title>
+</head>
+<body>
+    <ul id="ul">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+    </ul>
+    <table id="table">
+        <tr>
+            <th>姓名</th><th>年龄</th><th>性别</th>
+        </tr>
+        <tr>
+            <td>张三</td><td>23</td><td>男</td>
+        </tr>
+        <tr>
+            <td>李四</td><td>21</td><td>男</td>
+        </tr>
+        <tr>
+            <td>王五</td><td>26</td><td>男</td>
+        </tr>
+    </table>
+    <div></div>
+    <!-- hello world -->
+    <script>
+        (function () {
+            //动态脚本
+            function loadScript(src){
+                let script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = src;
+                document.body.appendChild(script);
+            }
+            loadScript("http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js");
+
+            function loadInlineScript(str){
+                let script = document.createElement("script");
+                script.type = "text/javascript";
+                try {
+                    script.appendChild(document.createTextNode(str)); //IE不支持DOM访问<script>的子节点
+                }catch (error){
+                    script.text = str; //早起safari不支持
+                }
+                document.body.appendChild(script);
+            }
+            loadInlineScript("function test(){console.log(this)} test();");
+
+            //动态样式
+            function loadStyle(url){
+                let link = document.createElement("link");
+                link.rel = "stylesheet";
+                link.type = "text/css";
+                link.href = url;
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
+            loadStyle("static/style.css");
+
+            function loadStyleString(str){
+                let style = document.createElement("style");
+                style.type = "text/css";
+                let head  = document.getElementsByTagName("head")[0];
+                try{
+                    style.appendChild(document.createTextNode(str)); //IE不支持
+                }catch (error){
+                    style.styleSheet.cssText = str;
+                }
+                head.appendChild(style);
+            }
+            loadStyleString("table td, table th {border: 1px solid #ccc}");
+
+            //操作表格 DOM操作表格过于繁琐，为了方便构建表格，HTML DOM为table tbody tr添加了一些属性和方法
+            function createTable(){
+                let table  = document.createElement("table");
+                table.insertRow(0);
+                table.rows[0].insertCell(0);
+                table.rows[0].cells[0].appendChild(document.createTextNode("name"));
+                table.rows[0].insertCell(1);
+                table.rows[0].cells[1].appendChild(document.createTextNode("color"));
+
+                table.insertRow(1);
+                table.rows[1].insertCell(0);
+                table.rows[1].cells[0].appendChild(document.createTextNode("apple"));
+                table.rows[1].insertCell(1);
+                table.rows[1].cells[1].appendChild(document.createTextNode("red"));
+                document.body.appendChild(table);
+            }
+            createTable();
+
+            //TODO  NodeList NamedNodeMap HTMLCollection 都是动态实时的查询，每当文档结构发生变化的时候，他们都会得到跟新。
+
+            /**
+             * 无限循环
+             */
+            function createElement(){
+                let divs = document.getElementsByTagName("div");
+                for(let i = 0; i < divs.length; i++){ //直接引用NodeList
+                    document.body.appendChild(document.createElement("div"));
+                }
+            }
+
+            /**
+             * 缓存length
+             */
+            function createElement1(){
+                let divs = document.getElementsByTagName("div"),
+                    len = divs.length,
+                    i;
+                for(i = 0; i < len; i++){
+                    document.body.appendChild(document.createElement("div"));
+                }
+            }
+            createElement1();
+
+        })();
+    </script>
+</body>
+</html>

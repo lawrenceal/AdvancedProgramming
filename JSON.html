@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <script>
+        var person = {
+            name: "lawrence",
+            sex: 'man',
+            age: 18,
+            hobby: ['eat','coding'],
+            birthday: new Date(1992,2,1)
+        };
+
+        var jsonText0 = JSON.stringify(person);
+        console.log(jsonText0);
+
+        var jsonText1 = JSON.stringify(person,["name", "sex"]);
+        console.log(jsonText1);
+
+
+        /*person.toJSON = function(){
+            return "hello json";
+        };*/
+
+        var jsonText = JSON.stringify(person, function(key, value){
+            switch (key){
+                case 'name':
+                    return "slx";
+                case 'sex':
+                    return "super man";
+                case 'hobby':
+                    return value.join(",");
+                case 'age':
+                    return undefined;
+                default:
+                    return value;
+            }
+        }, 10);
+
+        console.log(jsonText);
+
+        var personCopy = JSON.parse(jsonText, function(key, value){
+            if(key == "birthday"){
+                return new Date(value);
+            }else{
+                return value;
+            }
+        });
+
+        console.log(personCopy);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BOM</title>
+</head>
+<body>
+    <script>
+
+        //location
+        (function(window){
+            console.log("location.protocol = " + location.protocol);
+            console.log("location.hostname = " + location.hostname);
+            console.log("location.port = " + location.port);
+            console.log("location.host = " + location.host);
+            console.log("location.pathname = " + location.pathname);
+            console.log("location.search = " + location.search);
+            console.log("location.hash = " + location.hash);
+            console.log("location.href = " + location.href);
+            //TODO 上面所有操作修改url之后，都会在历史记录中生成一条新的记录
+
+            function getQueryStringArgs(){
+                let qs = location.search ? location.search.substring(1) : "",
+                    items = qs.length ? qs.split("&") : [],
+                    item = null,
+                    name = null,
+                    value = null,
+                    args = {},
+                    i,
+                    len = items.length;
+                for(i = 0; i < len; i++){
+                    item = items[i].split("=");
+                    name = decodeURIComponent(item[0]);
+                    value = decodeURIComponent(item[1]);
+                    if(name.length){
+                        args[name] = value;
+                    }
+                }
+                return args;
+            }
+
+            console.log(getQueryStringArgs());
+
+
+            /*location.assign("https://www.baidu.com/");
+            window.location = "https://www.baidu.com/"; //调用location.assign("https://www.baidu.com/");
+            location.href = "https://www.baidu.com/"; //调用location.assign("https://www.baidu.com/"); 最常用 */
+
+            //location.replace("https://www.baidu.com/");//不会在历史记录中生成新的记录
+
+            //location.reload(); //一最有效的方式重新加载（可能会从缓存中加载）;
+            //location.reload(true); //从服务器重新加载
+
+        })(window);
+
+        //navigator
+        (function(window){
+            console.log("navigator.appCodeName = " + navigator.appCodeName);
+            console.log("navigator.userAgent = " + navigator.userAgent);//
+            console.log("navigator.platform = " + navigator.platform);
+            console.log("navigator.appVersion = " + navigator.appVersion);
+            console.log("navigator.appName = " + navigator.appName);
+            console.log("navigator.onLine = " + navigator.onLine);//
+            console.log(navigator.plugins); //name filename descriptor length
+
+            //非IE中检测插件 最新IE支持
+            function hasPlugin(name){
+                name = name.toLowerCase();
+                let plugins = navigator.plugins,
+                    i,
+                    len = plugins.length;
+                for(i = 0; i < len; i++){
+                    if(plugins[i].name.toLowerCase().indexOf(name) > -1){
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            console.log("has plugin QuickTime " + hasPlugin("QuickTime"));
+            console.log("has plugin Flash " + hasPlugin("Flash"));
+
+            function hasIEPlugin(name){
+                try{
+                    new ActiveXObject(name);
+                    return true;
+                }catch (error){
+                    return false;
+                }
+            }
+            console.log(hasIEPlugin("ShockwaveFlash.ShockwaveFlash"));//ShockwaveFlash 标识符
+
+            //TODO 注册处理程序 registerContentHandler registerProtocolHandler
+
+        })(window);
+
+        //screen对象
+        (function(window){
+            console.log("screen.availWith = " + screen.availWidth);
+            console.log("screen.availHeight = " + screen.availHeight);//屏幕像素的高度 - 系统部件的高度
+            console.log("screen.height = " + screen.height);//屏幕像素的高度
+            console.log("screen.width = " + screen.width);
+        })(window);
+
+        //history对象
+        (function(window){
+
+            /*history.go(1); //向前一页
+            history.go(-1); //前后一页
+            history.go("baidu.com"); //跳到最近包含baidu.com的页面
+
+            history.forward();
+            history.back();*/
+
+            console.log("用户打开窗口的第一个页面 = " + (history.length == 0));  //TODO 1 ？
+        })(window);
+
+        (function(window){
+            let json = '{"2008": 39, "2009": 47,"2010": 86, "2011": 151, "2012": 492, "2013": 2345, "2014": 10529, "2015": 12671,"2016": 10275}',
+                obj = JSON.parse(json),
+                newObj = {};
+                arr = [];
+            for(let key in obj){
+                arr.push([key, obj[key]]);
+            }
+            console.log(arr);
+            for(let i = arr.length - 1; i >= 0; i--){
+                newObj[arr[i][0]] = arr[i][1];
+                //console.log("key = " + arr[i][0] + "; value = " + arr[i][1]);
+            }
+
+            console.log(newObj);
+
+            let staticObj = {};
+            staticObj[2014] = 14;
+            staticObj[2013] = 13;
+            staticObj[2011] = 11;
+            staticObj[2012] = 12;
+            console.log(staticObj);
+
+        })(window);
+    </script>
+</body>
+</html>

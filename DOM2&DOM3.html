@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DOM2和DOM3</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .div{
+            margin: 10px;
+            width: 100px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        #div2:after{
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #1ddbdd;
+        }
+
+        .box{
+            background-color: #1ddbdd;
+            padding: 20px;
+        }
+
+        .inner-box{
+            background-color: #5b9afb;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .cell{
+            background-color: #6FCAEF;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100px;
+            height: 30px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="div1" class="div" style="margin-top: 0">div1 </div>
+    <div >
+        <div id="div2" class="div">div2</div>
+    </div>
+    <div  style="height: 80px;overflow: hidden">
+        <div id="div3" style="background-color: #0000ff;font-size: 24px;float: left" class="div">div3</div>
+    </div>
+    <div class="box" id="box">
+        <div class="inner-box">
+            <div class="cell" id="cell">
+                cell
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 20px;background-color: #28a7e1;padding: 10px;" id="range"><div></div><p id="p1"><b>hello</b> world</p><div></div></div>
+    <div class="box" style="height: 550px;overflow: auto;margin-top: 20px">
+        <div class="cell" id="cell1" ></div>
+    </div>
+
+    <script>
+
+        //DOM变化
+        (function(){
+
+            //DocumentType类型
+            console.log("document.doctype.systemId = " + document.doctype.systemId); //html5用不到
+            console.log("document.doctype.publicId = " + document.doctype.publicId);
+
+            //Document类型
+            document.importNode(document.getElementById("div2"), true);//不同ownerDocument 不同文档 html用的不多
+            let parentWindow = document.defaultView || document.parentWindow; //指向给定文档的窗口
+            console.log(parentWindow);
+
+            //TODO document.implementation.createDocumentType document.implementation.createDocument document.createHTMLDocument 莫用
+
+            //Node类型
+            try{
+                console.log(document.body.isSupported("HTML", "2.0"));
+            }catch (error){
+                console.log("不支持 isSupported");
+            }
+
+            let cDiv1 = document.createElement("div");
+            cDiv1.setAttribute("name", "div1");
+            let cDiv2 = document.createElement("div");
+            let cDiv3 = document.createElement("div");
+            console.log(cDiv1.isSameNode(cDiv1)); //true
+            console.log(cDiv1.isEqualNode(cDiv2)); //false
+            console.log(cDiv3.isEqualNode(cDiv2)); //true
+            console.log(cDiv3.isSameNode(cDiv2)); //false
+
+            let div1 = document.querySelector("#div1");
+            try{
+                div1.setUserData("name", "hello", function(){});
+            }catch (error){
+                console.log("不支持 setUserData")
+            }
+
+        })();
+
+        //样式
+        (function(){
+
+            //任何支持style特性的html元素，在javascript中都有一个对应的style属性，这个style对象是CSSStyleDeclaration实例。
+            //在style特性中指定的任何css属性（不包括外部层叠而来的样式），都将表现为这个style对象的属性
+            let div3 = document.getElementById("div3");
+            console.log(div3.style.backgroundColor); //rgb(0, 0, 255)
+            div3.style.backgroundColor = "red";
+            div3.style.color = "#fff";
+            console.log(div3.style.cssFloat || div3.style.styleFloat); //float是保留字
+            console.log(div3.style);
+
+            let div2 = document.getElementById("div2");
+            div2.style.cssText = "background-color: blue; font-size: 20px;";
+            console.log(div2.style.length);
+            console.log(div2.style.getPropertyValue("font-size")); //不常用
+            div2.style.setProperty("color", "green", "important"); //不常用
+            div2.style.removeProperty("background-color"); //应用默认样式
+            try{
+                console.log(div2.style.getPropertyCSSValue("background-color"));
+            }catch (error){
+                console.log("style.getPropertyCSSValue 不支持"); //chrome不支持  firefox返回null
+            }
+            for(let i = 0; i < div2.style.length; i++)
+            {
+                let attrName = div2.style.item(i);
+                console.log(attrName + " = " + div2.style.getPropertyValue(attrName));
+            }
+
+
+            //计算的样式  getComputedStyle 计算样式都是只读，包含的默认样式可能因浏览器不同
+            //TODO 测试最新IE11支持getComputedStyle，但是不支持currentStyle
+            console.log();
+            let calStyle = document.defaultView.getComputedStyle(div2, null);
+            console.log(calStyle);
+            console.log(calStyle.width);
+            console.log(calStyle.border);
+
+            //操作样式表 感觉基本没用
+
+            //元素大小
+
+            //偏移量 TODO 只读 实时计算的
+            /** HTMLElement.offsetParent 是一个只读属性，返回一个指向最近的（closest，指包含层级上的最近）包含该元素的定位元素。
+            如果没有定位的元素，则 offsetParent 为最近的 table 元素对象或根元素（标准模式下为 html；quirks 模式下为 body）。
+            当元素的 style.display 设置为 "none" 时，offsetParent 返回 null。*/
+            let cell = document.querySelector("#cell");
+            console.log(cell.offsetParent);
+            console.log("offsetHeight = " + cell.offsetHeight);
+            console.log("offsetWidth = " + cell.offsetWidth);
+            console.log("offsetLeft = " + cell.offsetLeft);
+            console.log("offsetTop = " + cell.offsetTop);
+            cell.style.display = "none";
+            console.log("display none offsetParent = " + cell.offsetParent);
+            console.log("display none offsetHeight = " + cell.offsetHeight);
+            console.log("display none offsetWidth = " + cell.offsetWidth);
+            console.log("display none offsetLeft = " + cell.offsetLeft);
+            console.log("display none offsetTop = " + cell.offsetTop);
+            cell.style.visibility = "hidden";
+            console.log("visibility hidden offsetParent = " + cell.offsetParent);
+            console.log("visibility hidden offsetHeight = " + cell.offsetHeight);
+            console.log("visibility hidden offsetWidth = " + cell.offsetWidth);
+            console.log("visibility hidden offsetLeft = " + cell.offsetLeft);
+            console.log("visibility hidden offsetTop = " + cell.offsetTop);
+            cell.style.display = "block";
+            cell.style.visibility = "visible";
+            cell.parentNode.style.position = "relative";
+            console.log("parentNode position relative offsetHeight = " + cell.offsetHeight);
+            console.log("parentNode position relative offsetWidth = " + cell.offsetWidth);
+            console.log("parentNode position relative offsetLeft = " + cell.offsetLeft);
+            console.log("parentNode position relative offsetTop = " + cell.offsetTop);
+
+            /**
+             * 获取元素距离左侧（浏览器）距离
+             * @param element
+             * @returns {number|Number}
+             */
+            function getElementLeft(element){
+                let actualLeft = element.offsetLeft,
+                    current = element.offsetParent;
+                while(current != null){
+                    actualLeft += current.offsetLeft;
+                    current = current.offsetParent;
+                }
+                return actualLeft;
+            }
+            console.log(getElementLeft(cell));
+
+            /**
+             * 获取元素距离上侧（浏览器）距离
+             * @param element
+             * @returns {Number|number}
+             */
+            function getElementTop(element){
+                let actualTop = element.offsetTop,
+                    current = element.offsetParent;
+                while(current != null){
+                    actualTop += current.offsetTop;
+                    current = current.offsetParent;
+                }
+                return actualTop;
+            }
+            console.log(getElementTop(cell));
+
+            //客户区大小 TODO 只读 实时计算的
+            console.log("clientWidth = " + cell.clientWidth);// 不包含边框
+            console.log("clientHeight = " + cell.clientHeight);
+
+            /**
+             * 获取视口大小
+             * @returns {{height: number, width: number}}
+             */
+            function getViewPort(){
+                if(document.compatMode = "BackCompat"){
+                    return {
+                        height: document.body.clientHeight,
+                        width: document.body.clientWidth
+                    }
+                }else{
+                    return {
+                        height: document.documentElement.clientHeight,
+                        width: document.documentElement.clientWidth
+                    }
+                }
+            }
+            console.log(getViewPort());
+
+            //滚动大小
+            console.log("html scrollHeight = " + document.documentElement.scrollHeight);
+            console.log("html scrollWidth = " + document.documentElement.scrollWidth);
+
+            let cell1 = document.querySelector("#cell1");
+            let scrollElement = cell1.parentNode;
+            console.log("scrollHeight = " + scrollElement.scrollHeight);// 不包含边框
+            console.log("scrollWidth = " + scrollElement.scrollWidth); // 不包含边框
+            console.log("scrollLeft = " + scrollElement.scrollLeft);
+            console.log("scrollTop = " + scrollElement.scrollTop);
+            cell1.style.height = "600px";
+            console.log("scrollHeight = " + scrollElement.scrollHeight);
+            console.log("clientHeight = " + scrollElement.clientHeight);
+
+            //文档总高度（包括基于视口的最小高度）
+            let docHeight = Math.max(document.documentElement.clientHeight, document.documentElement.scrollHeight); //IE6混杂模式用body
+            let docWidth = Math.max(document.documentElement.clientWidth, document.documentElement.scrollWidth);
+            console.log("docHeight = " + docHeight + " docWidth = " + docWidth);
+
+            let scrollTop = document.documentElement.scrollTop || document.body.scrollTop; //TODO 所有最新浏览器只支持 document.body.scrollTop。浏览器的滚动元素是body
+            console.log(scrollTop);
+            //document.body.scrollTop = 50; 手动设置 ？
+
+            //元素大小
+            console.log("getBoundingClientRect().top = " + cell1.getBoundingClientRect().top);
+            console.log("getBoundingClientRect width = " + (cell1.getBoundingClientRect().right - cell1.getBoundingClientRect().left));
+            console.log("offsetWidth = " + cell1.offsetWidth);
+            console.log("clientWidth = " + cell1.clientWidth);
+
+            cell1.style.display = "none";
+            console.log("display none getBoundingClientRect width = " + (cell1.getBoundingClientRect().right - cell1.getBoundingClientRect().left));
+            console.log("display none offsetWidth = " + cell1.offsetWidth);
+            console.log("display none clientWidth = " + cell1.clientWidth);
+            cell1.style.display = "block";
+
+            cell1.style.visibility = "hidden";
+            console.log("visibility hidden offsetWidth = " + cell1.offsetWidth);
+            console.log("visibility hidden clientWidth = " + cell1.clientWidth);
+            console.log("visibility hidden getBoundingClientRect width = " + (cell1.getBoundingClientRect().right - cell1.getBoundingClientRect().left));
+            cell1.style.visibility = "visible";
+
+        })();
+
+        //遍历
+        (function(){
+            //NodeIterator IE11支持
+            let AllElement = document.createNodeIterator(document, NodeFilter.SHOW_ElEMENT, null, false);
+            console.log(AllElement);
+
+            let filter = function(node){
+                //console.log(node.nodeType); what to show ?
+                return node.nodeType == 1 && node.classList.contains("div") ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            };
+            let allBox = document.createNodeIterator(document.body, NodeFilter.SHOW_ElEMENT, filter, false);
+            let allBoxArr = [];
+            let currentNode = allBox.nextNode(); //previousNode
+            while(currentNode != null){
+                allBoxArr.push(currentNode);
+                currentNode = allBox.nextNode();
+            }
+            console.log(allBoxArr);
+
+            //TreeWalker
+            let allTreeWalkerBox = document.createTreeWalker(document.body, NodeFilter.SHOW_ElEMENT, filter, false);
+            allBoxArr = [];
+            currentNode = allTreeWalkerBox.nextNode();
+            while(currentNode != null){
+                allBoxArr.push(currentNode);
+                currentNode = allTreeWalkerBox.nextNode();
+            }
+            console.log(allBoxArr);
+
+            //TreeWalker提供更多的遍历方法 parentNode() firstChild() lastChild() nextSibling() previousSibling()
+        })();
+
+        //范围
+        (function(){
+
+            let secondBox = document.querySelector("#secondBox");
+            let p1 = document.querySelector("#p1");
+
+            //DOM范围实现简单的选择 selectNode selectNodeContents
+            let range = document.createRange();
+            range.selectNode(p1); //选择整个节点
+            console.log(range.startContainer);
+            console.log(range.startOffset);
+            console.log(range.endContainer);
+            console.log(range.endOffset);
+            console.log(range.commonAncestorContainer);
+
+            let range1 = document.createRange();
+            range1.selectNodeContents(p1); //只选择子节点
+            console.log(range1.startContainer);
+            console.log(range1.startOffset);
+            console.log(range1.endContainer);
+            console.log(range1.endOffset);
+            console.log(range1.commonAncestorContainer);
+
+            //DOM范围实现复杂的选择 setStart setEnd
+            let helloNode = p1.firstChild.firstChild,
+                worldNode = p1.lastChild,
+                range3 = document.createRange();
+            range3.setStart(helloNode, 2);
+            range3.setEnd(worldNode, 3);//有一个空格
+
+            //操作DOM范围中的内容
+            //range3.deleteContents();
+            let clone = range3.cloneContents();
+            p1.previousElementSibling.appendChild(clone);
+            let result = range3.extractContents();
+            p1.nextElementSibling.appendChild(result);
+
+            let span = document.createElement("span");
+            span.style.color = "yellow";
+            span.appendChild(document.createTextNode("Insert Node"));
+            range3.insertNode(span); //选区的开始位置
+
+            let spanSurround = document.createElement("span");
+            spanSurround.style.backgroundColor = "orange";
+            range3.surroundContents(spanSurround);
+
+            //折叠DOM范围 range.collapse(true) true:起点  collapsed
+
+            //比较DOM范围 compareBoundaryPoints
+
+            //复制ODM范围
+            let newRange = range3.cloneRange();
+
+            //清理DOM范围
+            range3.detach(); //从创建范围的DOM文档中分离出范围
+            range3 = null;
+
+        })();
+
+    </script>
+</body>
+</html>

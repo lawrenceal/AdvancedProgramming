@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建对象</title>
+</head>
+<body>
+
+    <script>
+        (function(){
+            //TODO 创建对象
+            let obj1 = new Object();
+            obj1.name = "obj1";
+            obj1.action = function(){
+                console.log("I want to eat something, my name is " + this.name);
+            };
+
+
+            //字面量方法
+            let obj2 = {
+                name: "obj2",
+                action: function () {
+                    console.log("I want to eat something, my name is " + this.name);
+                }
+            };
+            obj1.action();
+            obj2.action();
+
+
+            /**
+             * 工厂模式创建对象 解决创建多个对象重复的代码问题
+             * 缺点是无法识别每个对象的类型
+             * **/
+            function createObj(name, action){
+                let o = new Object();
+                o.name = name;
+                o.action = action;
+                return o;
+            }
+
+            function action(){
+                console.log("I want to eat something, my name is " + this.name);
+            }
+
+            let obj3 = createObj("obj3", action);
+            console.group("工厂模式创建对象");
+            obj3.action();
+            console.groupEnd();
+
+
+            /**
+             * 构造函数模式创建对象 解决创建对象无法识别类型问题
+             * 缺点: 相同的操作方法被创建多次 通过把函数定义转移到构造函数外部可以解决这个问题 引出来的问题是全局作用域当中存在多个函数，引用类型没有封装性可言
+             * 构造函数当成函数使用 会在全局添加无用变量 this = window
+             * **/
+            function Obj(name){
+                this.name = name;
+                this.action = function(){ //相当于 new Function(); 相同方法被创建多次
+                    console.log("I want to eat something, my name is " + this.name);
+                };
+                this.actionOuter = action;
+            }
+
+            let obj4 = new Obj("obj4");
+            let obj5 = new Obj("obj5");
+            console.group("构造函数模式创建对象");
+            obj4.action();
+            console.log(typeof obj4);
+            console.log("obj4 instanceof Obj = " + (obj4 instanceof Obj));
+            console.log("obj4.action == obj5.action = " + (obj4.action == obj5.action)); //false
+            console.log("obj4.actionOuter == obj5.actionOuter = " + (obj4.actionOuter == obj5.actionOuter)); //true
+            console.groupEnd();
+
+
+            /**
+             * 原型模式创建对象 解决相同的操作方法被创建多次
+             * 缺点: 无法传递参数 所有实例相同属性值 对于引用类型的属性会造成共享
+             * **/
+            function ObjPrototype (){}
+            ObjPrototype.prototype.name = "ObjPrototype";
+            ObjPrototype.prototype.action = function(){
+                console.log("I want to do something, my prototype name is " + this.name);
+            };
+            let prototypeObj = new ObjPrototype();
+            let prototypeObj1 = new ObjPrototype();
+            console.group("原型模式创建对象");
+            prototypeObj.name = "newObjPrototype";  //TODO 设置的是实例属性
+            prototypeObj.action();
+            prototypeObj1.action();
+            console.groupEnd("");
+
+            console.group("原型的动态性");
+            ObjPrototype.prototype.say = function(){
+                console.log("I want to say something, my name is " + this.name);
+            };
+            prototypeObj.say();
+            console.groupEnd();
+
+            //更简洁的原型语法1
+            ObjPrototype.prototype = {
+                constructor: ObjPrototype, //constructor 变成可迭代 不显示的设置constructor，会"继承"Object
+                name: "ObjPrototype",
+                eat: function(){
+                    console.log("I want to eat something, my name is " + this.name);
+                },
+                age: 23
+            };
+            console.log(prototypeObj.age);
+            let prototypeObj2 = new ObjPrototype();
+            prototypeObj2.eat();
+
+            //更简洁的原型语法2   es5 defineProperty constructor
+            ObjPrototype.prototype = {
+                name: "ObjPrototype",
+                action: function(){
+                    console.log("I want to eat something, my name is " + this.name);
+                },
+                color: ["blue", "red"]
+            };
+
+            Object.defineProperty(ObjPrototype.prototype, "constructor", {
+                value: ObjPrototype,
+                enumerable: false
+            });
+
+            console.group("原型共享引用类型");
+            let prototypeObj3 = new ObjPrototype();
+            let prototypeObj4 = new ObjPrototype();
+            prototypeObj3.color.push("blank");
+            console.log(prototypeObj3.color.toString());
+            console.log(prototypeObj4.color.toString());
+            console.groupEnd();
+
+            //TODO 原型的动态性 原生对象的原型
+        })();
+
+
+
+        (function(){
+
+            /**
+            * 结合使用构造函数模式和原型模式
+            * 缺点：构造函数和原型分开，部分开发人可能会干到困惑
+            * **/
+            function Person(name, age, friends){
+                this.name = name;
+                this.age = age;
+                this.friends = friends;
+            }
+
+            Person.prototype = {
+                constructor: Person,
+                eat: function(){
+                    console.log("I want to eat something, my name is " + this.name);
+                }
+            };
+
+            let person1 = new Person("Tom", 23, ["jack", "lawrence"]);
+            let person2 = new Person("lory", 20, ["Tom", "jack"]);
+            person1.friends.push("cat");
+
+            console.group("结合使用构造函数模式和原型模式");
+            console.log("Tom.friends = " + person1.friends.toString());
+            console.log("lory.friends = " +person2.friends.toString());
+            person1.eat();
+            person2.eat();
+            console.log("person1.eat == person2.eat : " + (person1.eat == person2.eat));
+            console.groupEnd();
+
+
+            /**
+             * 动态原型模式 解决构造函数和原型分离的问题
+             * 缺点：不能使用字面量形式给原型复制，会切断实例对象与原型之间的引用
+             * **/
+            function Person1(name){
+                this.name = name;
+
+                if(typeof this.sayName != "function"){
+                    Person1.prototype.sayName = function(){
+                        console.log("动态原型模式 name = " + this.name);
+                    };
+                   /* Person1.prototype = { //TODO 报错 构造函数创建新对象的时机 进入构造函数就会创建一个新对象 this指向新对象
+                        sayName: function(){
+                            console.log("动态原型模式 name = " + this.name);
+                        }
+                    };*/
+                }
+            }
+            var person1_1 = new Person1("fade");
+            console.group("动态原型模式");
+            person1_1.sayName();
+            console.groupEnd();
+
+
+            /**
+             * 寄生构造函数模式（自定义特殊类型行为）
+             * **/
+            function Person2(name, age){
+                let o = new Object();
+                o.name = name;
+                o.age = age;
+                o.sayName = function(){
+                    console.log(this.name);
+                };
+                return o;
+            }
+
+            let person2_1 = new Person2("lawrence", 23);
+            console.group("寄生构造函数模式");
+            person2_1.sayName();
+            console.log(person2_1);
+
+
+            /**
+             * 寄生构造函数模式（自定义特殊类型行为）
+             * **/
+            function SpecialArr(){
+                var arr = [];
+                arr.push.apply(arr, arguments);
+                arr.getStr = function(){
+                    console.log(this.join("|"));
+                };
+                return arr;
+            }
+
+            let specialArr = new SpecialArr(1, 2, 5, 8);
+            specialArr.getStr();
+            console.groupEnd();
+
+
+            /**
+             * 稳妥构造函数模式 没有this不用new操作符
+             * **/
+            function Person3(name, age){
+                let o = new Object();
+                o.sayName = function(){
+                    console.log("name = " + name + " age = " + age);
+                };
+                return o;
+            }
+
+            let person3_1 = Person3("lawrence", 24);
+            console.group("稳妥构造函数模式");
+            person3_1.sayName();
+            console.groupEnd();
+        }());
+    </script>
+</body>
+</html>
