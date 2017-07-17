@@ -8,6 +8,12 @@
     <script>
         (function(){
             /**
+             * 原型链：作为实现继承的主要方法。基本思想是利用原型让一个引用类型继承
+             * 另一个引用类型的属性和方法。一个类型的原型等于另一个类型的实例，此时
+             * 的原型对象将包含指向另一个类型原型的指针。
+             * */
+
+            /**
              * 原型链实现继承
              **/
             function SuperType(){
@@ -216,7 +222,6 @@
             instance3_1.sayName();
             console.log(instance3_1.colors);
             console.groupEnd();
-
 
             //javascript css nodeJs react angular
         })();
