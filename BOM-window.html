@@ -117,24 +117,30 @@
 
             //导航和打开窗口
             //window.open("http://www.caigin.com","left");
-            //let newWindow = window.open("http://www.baidu.com", "newWindow");//打开一个新窗口 name为newWindow _blank name = "";
+
+            //打开一个新窗口 name为newWindow _blank name = "";
+            //let newWindow = window.open("http://www.baidu.com", "newWindow");
 
            /* let newWindow1 = window.open("http://www.baidu.com", "newWindow1","width=600,height=600,top=10,left=10,resizeable=yes");
             newWindow1.resizeTo(1000,900);
             newWindow1.moveTo(300,300);
             newWindow1.close();
             console.log(newWindow1.closed);
-            console.log(newWindow1.opener); //window 在chrome中opener = null表示在独立的进程中运行新标签。不需要与打开他的标签进行通信*/
+
+            //window 在chrome中opener = null表示在独立的进程中运行新标签。不需要与打开他的标签进行通信
+            console.log(newWindow1.opener); */
 
             //弹出窗口屏蔽
             /*let locked = false;
 
             try{
                 let wroxWin = window.open("http://www.baidu.com");
-                if(wroxWin == null){ //内置程序阻止弹出窗口
+                //内置程序阻止弹出窗口
+                if(wroxWin == null){
                     locked = true;
                 }
-            }catch (error){ //其他扩展或者程序阻止弹出窗口
+            }catch (error){
+                //其他扩展或者程序阻止弹出窗口
                 locked = true;
             }
 
