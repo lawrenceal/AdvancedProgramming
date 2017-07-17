@@ -148,12 +148,15 @@
 
             //操作样式表 感觉基本没用
 
-            //元素大小
 
-            //偏移量 TODO 只读 实时计算的
+            console.group('元素大小');
+
+            //偏移量 只读 实时计算的
+
             /** HTMLElement.offsetParent 是一个只读属性，返回一个指向最近的（closest，指包含层级上的最近）包含该元素的定位元素。
             如果没有定位的元素，则 offsetParent 为最近的 table 元素对象或根元素（标准模式下为 html；quirks 模式下为 body）。
             当元素的 style.display 设置为 "none" 时，offsetParent 返回 null。*/
+
             let cell = document.querySelector("#cell");
             console.log(cell.offsetParent);
             console.log("offsetHeight = " + cell.offsetHeight);
@@ -161,13 +164,14 @@
             console.log("offsetLeft = " + cell.offsetLeft);
             console.log("offsetTop = " + cell.offsetTop);
             cell.style.display = "none";
-            console.log("display none offsetParent = " + cell.offsetParent);
+            console.log(cell.offsetParent);
             console.log("display none offsetHeight = " + cell.offsetHeight);
             console.log("display none offsetWidth = " + cell.offsetWidth);
             console.log("display none offsetLeft = " + cell.offsetLeft);
             console.log("display none offsetTop = " + cell.offsetTop);
+            cell.style.display = "block";
             cell.style.visibility = "hidden";
-            console.log("visibility hidden offsetParent = " + cell.offsetParent);
+            console.log(cell.offsetParent);
             console.log("visibility hidden offsetHeight = " + cell.offsetHeight);
             console.log("visibility hidden offsetWidth = " + cell.offsetWidth);
             console.log("visibility hidden offsetLeft = " + cell.offsetLeft);
@@ -175,6 +179,7 @@
             cell.style.display = "block";
             cell.style.visibility = "visible";
             cell.parentNode.style.position = "relative";
+            console.log(cell.offsetParent);
             console.log("parentNode position relative offsetHeight = " + cell.offsetHeight);
             console.log("parentNode position relative offsetWidth = " + cell.offsetWidth);
             console.log("parentNode position relative offsetLeft = " + cell.offsetLeft);
@@ -212,8 +217,9 @@
             }
             console.log(getElementTop(cell));
 
-            //客户区大小 TODO 只读 实时计算的
-            console.log("clientWidth = " + cell.clientWidth);// 不包含边框
+
+            //客户区大小 不包含边框滚动条 只读 实时计算的
+            console.log("clientWidth = " + cell.clientWidth);
             console.log("clientHeight = " + cell.clientHeight);
 
             /**
@@ -221,7 +227,7 @@
              * @returns {{height: number, width: number}}
              */
             function getViewPort(){
-                if(document.compatMode = "BackCompat"){
+                if(document.compatMode == "BackCompat"){
                     return {
                         height: document.body.clientHeight,
                         width: document.body.clientWidth
@@ -233,32 +239,53 @@
                     }
                 }
             }
+            console.log(document.compatMode);
             console.log(getViewPort());
 
-            //滚动大小
+            console.groupEnd();
+
+
+            console.group('滚动大小');
+
             console.log("html scrollHeight = " + document.documentElement.scrollHeight);
             console.log("html scrollWidth = " + document.documentElement.scrollWidth);
+            console.log("body scrollHeight = " + document.body.scrollHeight);
+            console.log("body scrollWidth = " + document.body.scrollWidth);
 
             let cell1 = document.querySelector("#cell1");
             let scrollElement = cell1.parentNode;
-            console.log("scrollHeight = " + scrollElement.scrollHeight);// 不包含边框
-            console.log("scrollWidth = " + scrollElement.scrollWidth); // 不包含边框
+            // 不包含边框
+            console.log("scrollHeight = " + scrollElement.scrollHeight);
+            // 不包含边框
+            console.log("scrollWidth = " + scrollElement.scrollWidth);
             console.log("scrollLeft = " + scrollElement.scrollLeft);
             console.log("scrollTop = " + scrollElement.scrollTop);
             cell1.style.height = "600px";
-            console.log("scrollHeight = " + scrollElement.scrollHeight);
-            console.log("clientHeight = " + scrollElement.clientHeight);
+            console.log("height 600px scrollHeight = " + scrollElement.scrollHeight);
+            console.log("height 600px clientHeight = " + scrollElement.clientHeight);
 
-            //文档总高度（包括基于视口的最小高度）
-            let docHeight = Math.max(document.documentElement.clientHeight, document.documentElement.scrollHeight); //IE6混杂模式用body
+            //文档总高度（包括基于视口的最小高度） IE6混杂模式用body
+            let docHeight = Math.max(document.documentElement.clientHeight, document.documentElement.scrollHeight);
             let docWidth = Math.max(document.documentElement.clientWidth, document.documentElement.scrollWidth);
             console.log("docHeight = " + docHeight + " docWidth = " + docWidth);
 
-            let scrollTop = document.documentElement.scrollTop || document.body.scrollTop; //TODO 所有最新浏览器只支持 document.body.scrollTop。浏览器的滚动元素是body
+            //所有最新浏览器只支持 document.body.scrollTop。浏览器的滚动元素是body
+
+            //存在问题，在最低端document.documentElement.scrollTop会返回 0
+            //let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+            let scrollTop = document.documentElement.scrollTop + document.body.scrollTop;
             console.log(scrollTop);
+
             //document.body.scrollTop = 50; 手动设置 ？
 
-            //元素大小
+            console.groupEnd();
+
+
+            console.group('元素大小');
+
+            //getBoundingClientRect 相对于视口的位置
+
             console.log("getBoundingClientRect().top = " + cell1.getBoundingClientRect().top);
             console.log("getBoundingClientRect width = " + (cell1.getBoundingClientRect().right - cell1.getBoundingClientRect().left));
             console.log("offsetWidth = " + cell1.offsetWidth);
@@ -275,6 +302,8 @@
             console.log("visibility hidden clientWidth = " + cell1.clientWidth);
             console.log("visibility hidden getBoundingClientRect width = " + (cell1.getBoundingClientRect().right - cell1.getBoundingClientRect().left));
             cell1.style.visibility = "visible";
+
+            console.groupEnd();
 
         })();
 
