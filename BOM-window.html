@@ -21,30 +21,39 @@
             window.age = 28;
             delete color;
             delete age;
-            console.log(color); //delete var声明的全局对象不能删除(configurable == false)
+
+            //delete var声明的全局对象不能删除(configurable == false)
+            console.log(color);
+
             try{
                 console.log(age);
             }catch (error){
-                console.log(error); //delete能够删除直接在window上定义的属性
+                //delete能够删除直接在window上定义的属性
+                console.log(error);
             }
 
             try{
-                var name = animal; //访问未定义的变量会报错
+                //访问未定义的变量会报错
+                var name = animal;
             }catch (error){
                 console.log(error);
             }
 
-            var sex = window.women; //通过window查询未定义的变量不会报错，相当于一次属性查询。
+            //通过window查询未定义的变量不会报错，相当于一次属性查询。
+            var sex = window.women;
             console.log(sex);
 
-            console.log("window.name = " + window.name); //TODO 除非最高层窗口是通过open打开的，否则window对象的name属性不会有任何值
+            //TODO 除非最高层窗口是通过open打开的，否则window对象的name属性不会有任何值
+            console.log("window.name = " + window.name);
             console.log(top["left"].name);  // top parent self
         })(window);
 
         //窗口位置
         (function(window){
             let windowLeftPos = (typeof window.screenLeft == "number") ? window.screenLeft : window.screenX;
-            let windowTopPos = (typeof window.screenTop == "number") ? window.screenTop : window.screenY; //统一相对于屏幕的坐标值
+
+            //统一相对于屏幕的坐标值
+            let windowTopPos = (typeof window.screenTop == "number") ? window.screenTop : window.screenY;
             console.log("window.screenLeft + " + window.screenLeft);
             console.log("window.screenTop + " + window.screenTop);
             console.log("window.screenX = " + window.screenX);
@@ -52,23 +61,32 @@
             console.log("windowLeftPos = " + windowLeftPos);
             console.log("windowTopPos = " + windowTopPos);
 
-            window.moveTo(500,110); //不起作用，被禁止了
-            window.moveBy(-50,-50); //不起作用，被禁止了
+            //不起作用，被禁止了
+            window.moveTo(500,110);
+            //不起作用，被禁止了
+            window.moveBy(-50,-50);
         })(window);
 
         //窗口大小
         (function(window){
-            console.log("window.outerHeight = " + window.outerHeight); //不同浏览器处理方式不同 chrome认为是视口， firefox认为是浏览器大小
+
+            //不同浏览器处理方式不同 chrome认为是视口， firefox认为是浏览器大小
+            console.log("window.outerHeight = " + window.outerHeight);
             console.log("window.outerWidth = " + window.outerWidth);
-            console.log("window.innerHeight = " + window.innerHeight); //现在统一认为视口的大小（未测试浏览器边框）
+
+            //现在统一认为视口的大小（未测试浏览器边框）
+            console.log("window.innerHeight = " + window.innerHeight);
             console.log("window.innerWidth = " + window.innerWidth);
 
-            let pageWidth = window.innerWidth, //视口的宽度
+            //虽然最终无法确定浏览器的的大小，TODO 但是却可以取得页面时候的大小， 如下
+            //视口的宽度，高度
+            let pageWidth = window.innerWidth,
                 pageHeight = window.innerHeight;
 
             if(typeof pageWidth != 'number'){
 
-                if(document.compatMode == "CSS1Compat"){ //IE6 ？ 标准模式才生效
+                //IE6 ？ 标准模式才生效
+                if(document.compatMode == "CSS1Compat"){
                     pageWidth = document.documentElement.clientWidth;
                     pageHeight = document.documentElement.clientHeight;
                 }else{
@@ -77,13 +95,21 @@
                 }
             }
 
+            console.log("document.body.clientHeight = " + document.body.clientHeight);
+            console.log("document.documentElement.clientHeight = " + document.documentElement.clientHeight);
             console.log("pageWidth = " + pageWidth);
             console.log("pageHeight =" + pageHeight);
 
-            //TODO 移动端 （除IE外）document.documentElement.clientWidth 保存的是布局视口。
-            //TODO 移动端  IE document.documentElement.clientWidth（跟随页面缩放）保存的是可见区域的视口(IE不支持window.innerWidth)，IE的布局视口保存在 document.body.clientWidth (不随页面缩放)中。
+            //移动端 （除IE外）document.documentElement.clientWidth 保存的是布局视口。
+            //移动端  IE document.documentElement.clientWidth（跟随页面缩放）保存的是可见区域的视口(IE不支持window.innerWidth)，
+            //IE的布局视口保存在 document.body.clientWidth (不随页面缩放)中。
+            // safari window.innerWidth 375  document.documentElement.clientWidth 360 ?
 
-            //TODO safari window.innerWidth 375  document.documentElement.clientWidth 360 ?
+            //总结 ：
+            //1.获取视口大小无论在什么端都用 innerWidth innerHeight，
+            //2.在最新浏览器中获取视口等于 document.documentElement.clientHeight document.documentElement.clientWidth
+            //3.通过 document.body.clientWidth document.body.clientHeight获取页面的大小
+
 
             window.resizeTo(100, 100); //被禁止
             window.resizeBy(100, 100); //被禁止
@@ -131,7 +157,8 @@
                 alert("hello world");
             }, 1000);
 
-            clearTimeout(timeoutId);//取消尚未执行的超时调用
+            //取消尚未执行的超时调用
+            clearTimeout(timeoutId);
 
             function func(){
                 let timeoutId = 1;
