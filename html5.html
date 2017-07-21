@@ -9,11 +9,14 @@
 <iframe src="http://192.168.1.12:3000/test.html" style="display: block;width: 100%"></iframe>
 
 <h2 id="dragText">hello drag</h2>
-<div id="dragDiv" style="border: 1px solid #0000ff" draggable="true">drag div</div>
 <input type="text">
 <button id="canDropBtn">can drop button</button>
 <button> button </button>
-<div style="height: 300px;border: 1px solid #1ddbdd;margin-top: 30px;" id="dragTargetContainer"></div>
+
+
+<div id="dragDiv" style="border: 1px solid #0000ff;margin: 10px 0;" draggable="true">drag div</div>
+<div id="dragDiv1" style="border: 1px solid #0000ff;margin: 10px 0;" draggable="true">drag div1</div>
+<div style="height: 300px;border: 1px solid #1ddbdd;margin-top: 30px;padding: 10px;" id="dragTargetContainer"></div>
 
 <body>
     <script>
@@ -43,10 +46,14 @@
         })();
 
         (() => {
+            //原生拖放
+
             var button = document.querySelector('#canDropBtn'),
                 dragText = document.querySelector('#dragText'),
                 dragDiv = document.querySelector('#dragDiv'),
-                dragTargetContainer = document.querySelector('#dragTargetContainer');
+                dragDiv1 = document.querySelector('#dragDiv1'),
+                dragTargetContainer = document.querySelector('#dragTargetContainer'),
+                currentDrag = null;
 
             button.addEventListener('dragover', function(event){
                 event.preventDefault();
@@ -86,26 +93,55 @@
 
 
             dragDiv.addEventListener('dragstart', function(event){
-                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.effectAllowed = 'moveCopy';
+                currentDrag = event.target;
+            }, false);
 
+            dragDiv.addEventListener('dragend', function(){
+                currentDrag = null;
+            }, false);
+
+
+            dragDiv1.addEventListener('dragstart', function(event){
+                event.dataTransfer.effectAllowed = 'moveCopy';
+                currentDrag = event.target;
+            }, false);
+
+            dragDiv1.addEventListener('dragend', function(){
+                currentDrag = null;
             }, false);
 
 
             dragTargetContainer.addEventListener('dragenter', function(event){
                 event.preventDefault();
-                event.dataTransfer.dropEffect = 'move';
-
-
+                event.dataTransfer.dropEffect = 'moveCopy';
+                this.style.backgroundColor = '#f7850d';
             }, false);
 
             dragTargetContainer.addEventListener('dragover', function(event){
                 event.preventDefault();
+            }, false);
 
+            dragTargetContainer.addEventListener('dragleave', function(){
+                this.style.backgroundColor = '#fff';
+            }, false);
 
+            dragTargetContainer.addEventListener('drop', function(event){
+                event.preventDefault();
+
+                if(currentDrag){
+                    currentDrag.parentNode.removeChild(currentDrag);
+                    this.appendChild(currentDrag);
+                }
+
+                this.style.backgroundColor = '#fff';
             }, false);
 
         })();
 
+        (() => {
+
+        })();
     </script>
 </body>
 </html>
