@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html5脚本编程</title>
+</head>
+
+<h1></h1>
+<iframe src="http://192.168.1.12:3000/test.html" style="display: block;width: 100%"></iframe>
+
+<h2 id="dragText">hello drag</h2>
+<div id="dragDiv" style="border: 1px solid #0000ff" draggable="true">drag div</div>
+<input type="text">
+<button id="canDropBtn">can drop button</button>
+<button> button </button>
+<div style="height: 300px;border: 1px solid #1ddbdd;margin-top: 30px;" id="dragTargetContainer"></div>
+
+<body>
+    <script>
+
+        (() => {
+            //跨文档信息传递（cross-document messaging）XDM
+
+            var iframeWindow;
+
+            //必须在onload后iframeWindow才就绪
+            window.onload = function(){
+                iframeWindow = document.querySelector('iframe').contentWindow;
+
+                //第一个参数只穿字符串，可以使用复杂数据，有兼容问题？
+                iframeWindow.postMessage('coffee', "http://192.168.1.12:3000/test.html");
+            };
+
+            window.addEventListener('message', function(event){
+
+                //source只是window对象的代理，不能通过这个代理对象访问其他属性。只用于调用 postMessage。
+                console.log(event.source === iframeWindow);
+                var h1 = document.querySelector('h1');
+                h1.innerText = event.origin + ' say : ' + event.data + '';
+            }, false);
+
+
+        })();
+
+        (() => {
+            var button = document.querySelector('#canDropBtn'),
+                dragText = document.querySelector('#dragText'),
+                dragDiv = document.querySelector('#dragDiv'),
+                dragTargetContainer = document.querySelector('#dragTargetContainer');
+
+            button.addEventListener('dragover', function(event){
+                event.preventDefault();
+                console.log('drag over');
+            }, false);
+
+            button.addEventListener('dragenter', function(event){
+                event.preventDefault();
+                console.log('drag enter');
+            }, false);
+
+            button.addEventListener('dragleave', function(event){
+                console.log('drag leave');
+            }, false);
+
+            button.addEventListener('drop', function(event){
+                event.preventDefault();
+                var text = event.dataTransfer.getData('text') ;
+                if(text){
+                    event.target.innerText = text;
+                }
+            }, false);
+
+
+            dragText.addEventListener('dragstart', function(){
+                console.log('drag start');
+            }, false);
+
+            dragText.addEventListener('drag', function(){
+                console.log('drag');
+            }, false);
+
+            dragText.addEventListener('dragend', function(){
+                console.log('drag end');
+            }, false);
+
+
+
+            dragDiv.addEventListener('dragstart', function(event){
+                event.dataTransfer.effectAllowed = 'move';
+
+            }, false);
+
+
+            dragTargetContainer.addEventListener('dragenter', function(event){
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+
+
+            }, false);
+
+            dragTargetContainer.addEventListener('dragover', function(event){
+                event.preventDefault();
+
+
+            }, false);
+
+        })();
+
+    </script>
+</body>
+</html>
