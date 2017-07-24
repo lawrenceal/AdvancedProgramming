@@ -6,12 +6,61 @@
 </head>
 <body>
     <script>
+
+        //安全的类型检测
         (() => {
 
+            function isArray(value){
+                return Object.prototype.toString.call(value) === '[object Array]';
+            }
 
+            function isFunction(value){
+                return Object.prototype.toString.call(value) === '[object Function]';
+            }
 
+            function isRegExp(value){
+                return Object.prototype.toString.call(value) === '[object RegExp]';
+            }
+
+            function isNativeJSON(value){
+                return Object.prototype.toString.call(value) === '[object JSON]';
+            }
+
+            console.log(isArray([]));
+
+            console.log(isFunction(function(){}));
+
+            console.log(isRegExp(/[/d]+/g));
+
+            console.log(isNativeJSON(JSON));
 
         })();
+
+
+        (() => {
+            console.group('作用域安全的构造函数');
+
+
+            function Animal(name, age){
+                if(this instanceof Animal){
+                    this.name = name;
+                    this.age = age;
+                }else{
+                    return new Animal(name, age);
+                }
+            }
+
+            var person = Animal('kitty', 25);
+            var person1 = new Animal('kitty', 25);
+            console.log(person1.name);
+            console.log(person.name);
+
+
+
+
+            console.groupEnd();
+        })();
+
     </script>
 </body>
 </html>
