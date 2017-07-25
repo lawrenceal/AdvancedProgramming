@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Advanced Techniques</title>
@@ -36,31 +36,219 @@
 
         })();
 
-
         (() => {
             console.group('作用域安全的构造函数');
 
 
-            function Animal(name, age){
+            function Animal(name){
                 if(this instanceof Animal){
                     this.name = name;
-                    this.age = age;
                 }else{
-                    return new Animal(name, age);
+                    return new Animal(name);
                 }
             }
 
-            var person = Animal('kitty', 25);
-            var person1 = new Animal('kitty', 25);
-            console.log(person1.name);
+            var animal = Animal('kitty');
+            var animal1 = new Animal('kitty');
+            console.log(animal.name);
+            console.log(animal1.name);
+
+            function Person(name, age){
+                this.age = age;
+                Animal.call(this, name);
+            }
+
+            var person = new Person('lawrence', 24);
             console.log(person.name);
 
+            function Dog(name, color){
+                this.color = color;
+                Animal.call(this, name);
+            }
 
+            Dog.prototype = new Animal();
+
+            var dog = new Dog('lucy');
+            console.log(dog.name);
 
 
             console.groupEnd();
         })();
 
+        (() => {
+            console.group('惰性载入函数');
+
+            var isNumber = function(value){
+                return typeof value === 'number' && isFinite(value);
+            };
+
+            var func = function(a, b){
+                if(isNumber(a) && isNumber(b)){
+                    var result = a + b;
+                    result += a * b;
+                    return result;
+                }else{
+                    var resultStr = a.toString() + ' ' + b.toString();
+                    resultStr = resultStr + ' to string ';
+                    return resultStr;
+                }
+            };
+
+            func(1, 2);
+
+
+            //第一次调用函数损失性能
+            var lazyFun = function(a, b){
+                if(isNumber(a) && isNumber(b)){
+                    lazyFun = function(){
+                        var result = a + b;
+                        result += a * b;
+                        return result;
+                    };
+                }else{
+                    lazyFun = function(){
+                        var resultStr = a.toString() + ' ' + b.toString();
+                        resultStr = resultStr + ' to string ';
+                        return resultStr;
+                    };
+                }
+                return lazyFun(a, b);
+            };
+
+
+            //代码首次加载时会损失一些性能
+            var lazyFunc = (function(a, b){
+                if(isNumber(a) && isNumber(b)){
+                   return function(){
+                       var result = a + b;
+                       result += a * b;
+                       return result;
+                   }
+                }else{
+                    return function(){
+                        var resultStr = a.toString() + ' ' + b.toString();
+                        resultStr = resultStr + ' to string ';
+                        return resultStr;
+                    }
+                }
+            })(1, 2);
+
+            lazyFunc(1, 2);
+
+            console.groupEnd();
+        })();
+
+        (() => {
+            console.group('函数绑定');
+
+            //主要用于事件处理程序 setTimeout setInternal。被绑定函数与普通函数相比有更多的开销，需要更多的内存，多重调用稍微慢。
+
+            var handler = {
+                message: 'hello handler',
+                handlerLoad: function(event){
+                    console.log(event.target);
+                    console.log(this.message);
+                }
+            };
+
+            window.addEventListener('load', handler.handlerLoad, false);
+
+
+            var bind = function(fn, context){
+                return function(){
+                    fn.apply(context, arguments);
+                }
+            };
+
+            window.addEventListener('load', bind(handler.handlerLoad, handler), false);
+
+            window.addEventListener('load', handler.handlerLoad.bind(handler), false);
+
+
+            console.groupEnd();
+        })();
+
+        //函数柯里化
+        (() => {
+            console.group('函数柯里化');
+
+            function add(a, b){
+                return a + b;
+            }
+
+            function curry(fn){
+                var slice = Array.prototype.slice,
+                    args = slice.call(arguments, 1),
+                    innerArgs = null,
+                    finalArgs = null;
+
+                return function(){
+                    innerArgs = slice.call(arguments);
+                    finalArgs = args.concat(innerArgs);
+                    return fn.apply(null, finalArgs);
+                }
+            }
+
+            var curriedAdd = curry(add, 1);
+            console.log(curriedAdd(3));
+
+
+            //TODO es5的 bind实现了函数柯里化 bind(context, arg1, ...)
+
+            console.groupEnd();
+        })();
+
+        //防篡改对象
+        (() => {
+            console.group('防篡改对象');
+
+            //不可扩展 TODO 可修改可删除
+            var obj = {
+                name: 'lawrence'
+            };
+
+            console.log(Object.isExtensible(obj));
+            obj.age = 12;
+            Object.preventExtensions(obj);
+            obj.sex = 'men';
+            obj.name = 'kitty';
+            delete obj.name;
+            console.log('preventExtensions age = ' + obj.age + ' sex = ' + (obj.sex) + ' name = ' + obj.name);
+
+
+            //密封对象 TODO 可以修改
+            var obj1 = {
+                name: 'lawrence'
+            };
+            Object.seal(obj1);
+            obj1.age = 12;
+            delete obj1.name;
+            obj1.name = 'kitty';
+
+            console.log(Object.isExtensible(obj1));
+            console.log(Object.isSealed(obj1));
+            console.log('seal name = ' + obj1.name + ' age = ' + obj1.age);
+
+
+            //冻结的对象 TODO 不能修改 Writable : false 如果定义 [[Set]]，访问器属性仍然是可写的
+            var obj2 = {
+                name: 'lawrence'
+            };
+            Object.freeze(obj2);
+            console.log(Object.isSealed(obj2));
+            console.log(Object.isExtensible(obj2));
+            obj2.name = 'kitty';
+            console.log("freeze name = " + obj2.name);
+
+            console.groupEnd();
+        })();
+
+        //高级定时器
+        (() => {
+
+
+
+        })();
     </script>
 </body>
 </html>
