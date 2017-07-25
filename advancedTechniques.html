@@ -5,6 +5,14 @@
     <title>Advanced Techniques</title>
 </head>
 <body>
+    <div style="height: 100px;position: relative">
+        <div id="animate" style="width: 50px;height: 50px;position: absolute;top: 20px;border: 1px solid orange; left: 0"></div>
+    </div>
+    <div style="height: 100px;position: relative">
+        <div id="animate1" style="width: 50px;height: 50px;position: absolute;top: 20px;border: 1px solid orange; left: 0"></div>
+    </div>
+
+    <div style="background-color: #1ddbdd;" id="box"></div>
     <script>
 
         //安全的类型检测
@@ -246,9 +254,72 @@
         //高级定时器
         (() => {
 
+            //重复定时器
+
+            //当使用setInterval时，仅当没有队列中没有该定时器的代码实例时，才将定时器代码添加到队列。
+
+            //setInterval 存在的问题: 1.某些间隔会被跳过 2.多个定时器的代码执行之间的间隔可能比预期的小。
+
+
+            //链式setTimeout()，在一个定时器代码执行完之前，不会向队列中插入新的定时器代码。
+
+            setTimeout(function(){
+                var element = document.querySelector('#animate'),
+                    left = parseInt(element.style.left) + 5;
+
+                if(left <= 200){
+                    element.style.left = left + 'px';
+                    setTimeout(arguments.callee, 50);
+                }
+            }, 50);
+
+
+            requestAnimationFrame(function(){
+                var element = document.querySelector('#animate1'),
+                    left = parseInt(element.style.left) + 5;
+
+                if(left <= 200){
+                    element.style.left = left + 'px';
+                    requestAnimationFrame(arguments.callee);
+                }
+            });
+
+
+            //脚本长时间运行通常原因： 过长，过深的嵌套的函数调用，大量处理的循环。
+
+            //大量的循环，不要求"同步"， 不要求"按顺序完成"。利用定时器对数组进行分割（数组分块的技术）。
+
+
+            //高频率的更改可能会让浏览器崩溃。可以用定时器对函数进行节流。
+
+
+            function throttle(method, context){
+                clearTimeout(method.tId);
+                method.tId = setTimeout(function(){
+                    method.apply(context);
+                }, 100);
+            }
+
+            function resizeDiv(){
+                console.log('执行了');
+                var box = document.querySelector('#box');
+                box.style.height = box.offsetWidth + 'px';
+            }
+
+            window.onload = window.onresize = function(){
+                console.log(window.innerWidth);
+                throttle(resizeDiv);
+            }
+
+        })();
+
+        //自定义事件
+        (() => {
+
 
 
         })();
+
     </script>
 </body>
 </html>
