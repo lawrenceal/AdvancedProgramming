@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html manifest="offline.manifest">
+<head>
+    <meta charset="UTF-8">
+    <title>offline application & client storage</title>
+    <link rel="stylesheet" href="http://caigin.com/web/static/css/TOB/index-concise.css">
+</head>
+<body>
+    <h2>
+        hello appcache
+        <a href="advancedTechniques.html" target="_blank">advancedTechniques</a>
+        <a href="http://www.baidu.com">百度一下</a>
+    </h2>
+    <script>
+        (function () {
+
+            //离线检测
+            console.log('navigator.onLine = ' + (navigator.onLine));
+
+            window.addEventListener('offline', function(){
+                console.log('offline');
+            }, false);
+
+            window.addEventListener('online', function () {
+                console.log('online')
+            }, false);
+
+
+            //应用缓存(application cache) appcache manifest文件 FIXME online情况下时候会使用缓存
+
+            //1: 无缓存  3：下载中 4：更新完成
+            console.log('applicationCache.status = ' + applicationCache.status);
+
+            //事件
+            applicationCache.addEventListener('cached', function(){
+                console.log('cached');
+            }, false);
+
+            applicationCache.addEventListener('updateready', function () {
+                console.log('updateready'); //TODO ?
+            }, false);
+
+        })();
+
+        (function () {
+            //TODO 数据存储
+
+            //TODO cookie
+
+            //最初用处存储会话信息，服务器对任意HTTP请求发送 Set-Cookie HTTP头作为响应的一部分, 格式key: value（URL编码）
+            //浏览器存储信息，并在这之后，会为每个请求添加Cookie HTTP头(紧包含 key name)将信息发送回服务器。
+
+            //限制：cookie绑定在特定的域中。
+            //"同域"数量限制： opera： 30 firefox: 50  safari chrome: 没有限制； 超过会清除以前，或最近最少使用，可能随机。
+            //"同域"大小限制：4096（B）+或- 1 ，兼容限制在： 4095（B）; 超过，丢掉
+
+            //构成：
+            //key: 不区分大小写
+            //name: URL编码
+            //域 (domain)： 可以不包含子域（.baidu.com）;
+            //路径 （path）：
+            //失效时间（expire）：默认会话结束即将所有cookie删除。时间设为以前时间，cookie会被立刻删除。
+            //安全标志 (secure)：ssh https发送
+
+            //思考：
+            //'HTTP 专有 cookie',可以在浏览器和服务器端设置，但是只能在服务器端读取。
+            //每次请求都会作为请求头发送，影响到特定域的请求性能。
+
+            document.cookie = 'name=lawrence';
+            console.log('cookie = ' + document.cookie);
+
+            //子cookie：绕开同域下数量限制 FIXME
+
+
+            //TODO web存储机制（web storage）
+
+            //Storage类型：提供最大的存储空间来存储键值对(只能存储字符串)。 方法：clear setItem removeItem getItem key
+
+            //sessionStorage: 针对于会话的小段数据存储。
+
+            sessionStorage.setItem('sessionStorage', 'sessionStorage');
+
+            //globalStorage TODO chrome不支持
+
+            //globalStorage['www.baidu.com'].setItem('globalStorage', 'globalStorage');
+
+            //localStorage 同一个域（子域无效）跨会话大数据量存储数据的机制
+
+            //web storage限制：以源（协议，域，端口）为单位对存储空间大小限制，不同浏览器不同 2.5MB - 5MB
+
+
+            document.addEventListener('storage', function (event) {
+                console.log(event.domain);
+                console.log(event.oldValue);
+                console.log(event.newValue);
+            }, false);
+            localStorage.setItem('name', 'lawrence');
+
+
+            //TODO IndexedDB
+            //使用对象保存结构化数据的数据库
+            //限制： 只能由同源页面操作 大小限制5MB 50MB
+
+            var request = null,
+                database = null;
+
+            request = indexedDB.open('admin');
+
+            request.onsuccess = function(event){
+                database = event.target.result;
+                /*if(database.version !== '1.0'){
+                    request = database.setVersion('1.0');
+                    request.onsuccess = function(){
+                        var store = database.createObjectStore('users',{keyPath: 'username'});
+                        console.log(store);
+                    }
+                }*/
+            };
+
+            request.onerror  = function(event){
+                console.log(event.target.errorCode)
+            };
+
+
+
+
+        })();
+    </script>
+</body>
+</html>
