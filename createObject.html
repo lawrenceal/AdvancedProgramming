@@ -50,7 +50,9 @@
 
             /**
              * 构造函数模式创建对象 解决创建对象无法识别类型问题
-             * 缺点: 相同的操作方法被创建多次 通过把函数定义转移到构造函数外部可以解决这个问题 引出来的问题是全局作用域当中存在多个函数，引用类型没有封装性可言
+             * 缺点: 相同的操作方法被创建多次 通过把函数定义转移到构造函数外部可以解决这个问题
+             * 引出来的问题是全局作用域当中存在多个函数，引用类型没有封装性可言
+             *
              * 构造函数当成函数使用 会在全局添加无用变量 this = window
              * **/
             function Obj(name){
@@ -179,7 +181,9 @@
                     Person1.prototype.sayName = function(){
                         console.log("动态原型模式 name = " + this.name);
                     };
-                   /* Person1.prototype = { //TODO 报错 构造函数创建新对象的时机 进入构造函数就会创建一个新对象 this指向新对象
+
+                   /* //TODO sayName is not a function 报错 构造函数创建新对象的时机 进入构造函数就会创建一个新对象 this指向新对象
+                    Person1.prototype = {
                         sayName: function(){
                             console.log("动态原型模式 name = " + this.name);
                         }
@@ -224,11 +228,14 @@
             }
 
             let specialArr = new SpecialArr(1, 2, 5, 8);
+            let specialArr1 = SpecialArr(1,10,12);
             specialArr.getStr();
+            specialArr1.getStr();
             console.groupEnd();
 
 
             /**
+             * 稳妥：没有公共属性。
              * 稳妥构造函数模式 没有this不用new操作符
              * **/
             function Person3(name, age){
