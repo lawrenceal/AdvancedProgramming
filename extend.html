@@ -150,7 +150,8 @@
             console.log(person2.like);
             console.groupEnd();
 
-            //TODO es5规范了原型式继承 Object.create() 参数1：作为新对象原型的对象 参数2：为新对象定义额外属性的对象（与defineProperties第二个参数的格式相同）
+            //TODO es5规范了原型式继承 Object.create()
+            //TODO 参数1：作为新对象原型的对象 参数2：为新对象定义额外属性的对象（与defineProperties第二个参数的格式相同）
 
             console.group("原型式继承 es5规范化 Object.create()");
             let person3 = Object.create(person);
@@ -161,7 +162,7 @@
             console.log(person3.like);
             let person4 = Object.create(person);
             console.log(person4.like);
-            let person5 = Object.create(person,{
+            let person5 = Object.create(person, {
                 name: {
                     value: "person5"
                 }
@@ -210,6 +211,7 @@
                 SuperType3.call(this, age);
             }
 
+            //SubType3.prototype = Object.create(SuperType3.prototype);
             inheritPrototype(SubType3, SuperType3);
 
             SubType3.prototype.sayName = function(){
@@ -221,6 +223,7 @@
             instance3_1.sayAge();
             instance3_1.sayName();
             console.log(instance3_1.colors);
+            console.log(instance3_1.constructor);
             console.groupEnd();
 
             //javascript css nodeJs react angular
