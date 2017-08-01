@@ -5,9 +5,57 @@
     <title>事件类型</title>
 </head>
 <body>
-
+    <div style="margin: 40px;padding: 40px;border: 1px solid blue;width: 200px; height: 200px;">
+        <div style="width: 140px;height: 140px;border: 1px solid orange" id="mouse" class="outer">
+            <div style="margin: 40px;width: 60px;height: 60px;background-color: #1ddbdd;" class="inner"></div>
+        </div>
+    </div>
     <script>
+        (function () {
+            var mouseEle = document.querySelector('#mouse');
 
+            //不冒泡
+            mouseEle.addEventListener('mouseenter', function(event){
+                console.log(event.type);
+            }, false);
+
+            //不冒泡
+            mouseEle.addEventListener('mouseleave', function(event){
+                console.log(event.type);
+            }, false);
+
+            mouseEle.addEventListener('mousemove', function(event){
+                console.log(event.type);
+            }, false);
+
+            //移入到另一个元素触发， 元素内部，元素外部
+            mouseEle.addEventListener('mouseout', function(event){
+                console.log(event.type);
+            }, false);
+
+            mouseEle.addEventListener('mouseover', function(event){
+                console.log(event.type);
+                console.log("target className = " + event.target.className);
+                console.log("relatedTarget className = " + event.relatedTarget.className)
+            }, false);
+
+            mouseEle.addEventListener('mousedown', function(event){
+                console.log(event.type);
+            }, false);
+
+            mouseEle.addEventListener('mouseup', function(event){
+                console.log(event.type);
+            }, false);
+
+            mouseEle.addEventListener('click', function(event){
+                console.log(event.type);
+            }, false);
+
+            mouseEle.addEventListener('dblclick', function(event){
+                console.log(event.type);
+            }, false);
+
+        })();
     </script>
 </body>
 </html>
