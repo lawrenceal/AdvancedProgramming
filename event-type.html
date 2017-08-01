@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>事件类型</title>
 </head>
-<body>
+<body >
     <div style="margin: 40px;padding: 40px;border: 1px solid blue;width: 200px; height: 200px;">
         <div style="width: 140px;height: 140px;border: 1px solid orange" id="mouse" class="outer">
             <div style="margin: 40px;width: 60px;height: 60px;background-color: #1ddbdd;" class="inner"></div>
@@ -12,6 +12,7 @@
     </div>
     <iframe src="http://www.caigin.com" style="width: 200px;height: 200px;" id="iFrame"></iframe>
     <img src="http://caigin.com/web/static/img/TOB/index-optmz-asset.jpg" alt="" style="width: 200px;height: auto;" id="image">
+    <div style="height: 1000px;border: 1px solid red"></div>
     <script>
         //UI event
         (function(){
@@ -28,7 +29,18 @@
             Image.addEventListener('load',function(event){
                 console.log('image ' + event.type)
             }, false);
-            
+
+            window.addEventListener('resize', function(event){
+                console.log(event.type);
+            }, false);
+
+            //event.type document
+            window.addEventListener('scroll', function (event) {
+                console.log(event.type);
+            }, false);
+
+
+
         })();
 
         //Mouse Event
