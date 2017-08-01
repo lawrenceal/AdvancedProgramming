@@ -10,12 +10,25 @@
             <div style="margin: 40px;width: 60px;height: 60px;background-color: #1ddbdd;" class="inner"></div>
         </div>
     </div>
+    <iframe src="http://www.caigin.com" style="width: 200px;height: 200px;" id="iFrame"></iframe>
+    <img src="http://caigin.com/web/static/img/TOB/index-optmz-asset.jpg" alt="" style="width: 200px;height: auto;" id="image">
     <script>
         //UI event
         (function(){
+            window.addEventListener('load', function(event){
+                console.log(event.type);
+            }, false);
 
+            var iFrame = document.querySelector('#iFrame');
+            iFrame.addEventListener('load', function (event) {
+                console.log('frame ' + event.type);
+            }, false);
 
-
+            var Image = document.querySelector('#image');
+            Image.addEventListener('load',function(event){
+                console.log('image ' + event.type)
+            }, false);
+            
         })();
 
         //Mouse Event
