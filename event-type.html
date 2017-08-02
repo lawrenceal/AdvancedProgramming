@@ -5,6 +5,9 @@
     <title>事件类型</title>
 </head>
 <body onload="console.log('body load')">
+    <div style="margin: 20px;">
+        <input type="text" placeholder="key" id="key">
+    </div>
     <div style="margin: 40px;padding: 40px;border: 1px solid blue;width: 200px; height: 200px;">
         <div style="width: 140px;height: 140px;border: 1px solid orange" id="mouse" class="outer">
             <div style="margin: 40px;width: 60px;height: 60px;background-color: #1ddbdd;" class="inner"></div>
@@ -211,6 +214,62 @@
                 console.log("wheelDelta = " + event.wheelDelta);
             }, false);
         })();
+
+
+        //键盘和文本事件
+        (function(){
+            var keyEle = document.querySelector('#key');
+
+            keyEle.addEventListener('keydown', function(event){
+                console.log(event.type);
+                console.log("keyCode = " + event.keyCode);
+
+                //废弃
+                console.log('charCode = ' + event.charCode);
+
+                //IE9
+                console.log('key = '+ event.key );
+
+                //不支持
+                console.log('char = ' + event.char);
+            }, false);
+
+
+            //TODO keypress firefox删除键触发， safari chrome不触发
+            //TODO safari 数字键不触发 keypress
+            //字符键触发
+            keyEle.addEventListener('keypress', function(event){
+                console.log(event.type);
+            }, false);
+
+
+            keyEle.addEventListener('keyup', function(event){
+                console.log(event.type);
+            }, false);
+
+
+            //TODO firefox 不支持 textInput
+            //字符键触发
+            keyEle.addEventListener('textInput', function(event){
+                console.log(event.type);
+                console.log('text input data = ' + event.data);
+                console.log('input method = ' + event.inputMethod);
+            }, false);
+
+            //keydown keypress textInput 文本框发生变化之前 "依次" 触发
+
+
+            //TODO keypress对比textInput
+            //1.任何能够获取焦点的元素都能触发keypress，只有可编辑区域才能触发textInput
+            //2.textInput只有在输入实际字符时才会触发，keypress在那些影响文本显示键时也会触发(例如空格键)。 firefox
+
+
+
+
+        })();
+
+
+
     </script>
 </body>
 </html>
