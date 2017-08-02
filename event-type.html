@@ -17,6 +17,10 @@
         <option value="1">北京</option>
         <option value="2">上海</option>
     </select>
+    <div style="margin: 20px;" id="box">
+        <div><input type="text" placeholder="top" id="top"></div>
+        <div><input type="text" placeholder="bottom" id="bottom"></div>
+    </div>
     <div style="height: 1000px;border: 1px solid red">
         <div style="height: 300px; width: 100px;border: 1px solid red;overflow: scroll" id="scrollDiv">
             <div style="height: 400px; width: 50px;margin: 0 auto;border: 1px solid blue;"></div>
@@ -88,6 +92,53 @@
 
 
         })();
+
+
+        //焦点事件
+        (function(){
+            var top = document.querySelector('#top'),
+                box = document.querySelector('#box'),
+                bottom = document.querySelector('#bottom');
+
+            //冒泡 focusin focusout
+           /* box.addEventListener('focusin', function (event) {
+                console.log(event.type);
+                console.log(event.target.id);
+            }, false);
+
+            box.addEventListener('focusout', function (event) {
+                console.log(event.type);
+                console.log(event.target.id);
+            }, false);*/
+
+
+            //TODO chrome safari firefox 按照此顺序触发
+
+            top.addEventListener('blur', function(event){
+                console.log(event.type);
+                console.log(event.target.id);
+            }, false);
+
+            top.addEventListener('focusout', function (event) {
+                console.log(event.type);
+                console.log(event.target.id);
+            }, false);
+
+            bottom.addEventListener('focus', function(event){
+                console.log(event.type);
+                console.log(event.target.id);
+
+                console.log(document.activeElement);
+                console.log(document.hasFocus());
+            }, false);
+
+            bottom.addEventListener('focusin', function (event) {
+                console.log(event.type);
+                console.log(event.target.id);
+            }, false);
+
+        })();
+
 
         //Mouse Event
         (function () {
