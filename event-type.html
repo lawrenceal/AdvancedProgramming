@@ -3,8 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>事件类型</title>
+    <style>
+        .contextMenu{
+            width: 100px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: none;
+            background-color: #fff;
+            box-shadow: 0 0 12px rgba(0, 0, 0, .2);
+            list-style: none;
+        }
+
+        .contextMenu li{
+            height: 26px;
+            line-height: 26px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+
+        }
+    </style>
 </head>
 <body onload="console.log('body load')">
+    <div><a href="#hi">hi</a></div>
+    <div><a href="http://www.baidu.com">百度一下</a></div>
     <div style="margin: 20px;">
         <input type="text" placeholder="key" id="key">
     </div>
@@ -29,6 +53,10 @@
             <div style="height: 400px; width: 50px;margin: 0 auto;border: 1px solid blue;"></div>
         </div>
     </div>
+    <ul class="contextMenu" id="contextMenu">
+        <li>北京</li>
+        <li>上海</li>
+    </ul>
     <script>
         //UI event
         (function(){
@@ -38,7 +66,7 @@
 
 
             window.addEventListener('load', function(event){
-                console.log('window' + event.type);
+                console.log('window ' + event.type);
                 console.log(event.target);
             }, false);
 
@@ -263,11 +291,79 @@
             //1.任何能够获取焦点的元素都能触发keypress，只有可编辑区域才能触发textInput
             //2.textInput只有在输入实际字符时才会触发，keypress在那些影响文本显示键时也会触发(例如空格键)。 firefox
 
-
-
-
         })();
 
+
+        //TODO 复合事件
+
+
+        //TODO 变动事件
+
+
+        //html5事件
+        (function(){
+
+            var contextMenu = document.getElementById('contextMenu');
+
+            document.addEventListener('contextmenu', function (event) {
+                event.preventDefault();
+
+                contextMenu.style.left = event.clientX + 'px';
+                contextMenu.style.top = event.clientY + 'px';
+                contextMenu.style.display = 'block';
+            }, false);
+
+            document.addEventListener('click', function(event){
+                if(event.target !== contextMenu && event.target.parentNode !== contextMenu){
+                    contextMenu.style.display = 'none';
+                }
+            }, false);
+
+
+           /* window.addEventListener('beforeunload', function(event){
+
+                //字符无用
+                event.returnValue = 'hello world';
+                return 'hello world';
+            }, false);*/
+
+           //形成完整的DOM树就触发
+            document.addEventListener('DOMContentLoaded', function(event){
+                console.log(event.type);
+            }, false);
+
+            //状态触发不明确
+            document.addEventListener('readystatechange', function(event){
+                console.log(event.type);
+                console.log("readyState = " + event.target.readyState);
+            }, false);
+
+
+            var showAccount = 0;
+
+            //TODO bfcache ？
+            //bfcache恢复不会触发load
+            //load之后触发，必须加到window上。
+            window.addEventListener('pageshow', function(event){
+                console.log(event.type);
+                showAccount++;
+                console.log('showAccount = ' + showAccount);
+                console.log('persisted = ' + event.persisted );
+            }, false);
+
+            window.addEventListener('pagehide', function(event){
+                console.log(event.type);
+            }, false);
+
+
+            //必须加到window中
+            window.addEventListener('hashchange', function(event){
+                console.log(event.type);
+                console.log("oldURL = " + event.oldURL);
+                console.log("newURL = " + event.newURL);
+            }, false);
+
+        })();
 
 
     </script>
