@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>事件类型</title>
 </head>
-<body >
+<body onload="console.log('body load')">
     <div style="margin: 40px;padding: 40px;border: 1px solid blue;width: 200px; height: 200px;">
         <div style="width: 140px;height: 140px;border: 1px solid orange" id="mouse" class="outer">
             <div style="margin: 40px;width: 60px;height: 60px;background-color: #1ddbdd;" class="inner"></div>
@@ -12,12 +12,27 @@
     </div>
     <iframe src="http://www.caigin.com" style="width: 200px;height: 200px;" id="iFrame"></iframe>
     <img src="http://caigin.com/web/static/img/TOB/index-optmz-asset.jpg" alt="" style="width: 200px;height: auto;" id="image">
-    <div style="height: 1000px;border: 1px solid red"></div>
+    <input type="radio">
+    <select >
+        <option value="1">北京</option>
+        <option value="2">上海</option>
+    </select>
+    <div style="height: 1000px;border: 1px solid red">
+        <div style="height: 300px; width: 100px;border: 1px solid red;overflow: scroll" id="scrollDiv">
+            <div style="height: 400px; width: 50px;margin: 0 auto;border: 1px solid blue;"></div>
+        </div>
+    </div>
     <script>
         //UI event
         (function(){
-            window.addEventListener('load', function(event){
+            window.addEventListener('unload', function(event){
                 console.log(event.type);
+            }, false);
+
+
+            window.addEventListener('load', function(event){
+                console.log('window' + event.type);
+                console.log(event.target);
             }, false);
 
             var iFrame = document.querySelector('#iFrame');
@@ -29,16 +44,47 @@
             Image.addEventListener('load',function(event){
                 console.log('image ' + event.type)
             }, false);
+            //TODO <script>
+
 
             window.addEventListener('resize', function(event){
                 console.log(event.type);
             }, false);
 
+
             //event.type document
             window.addEventListener('scroll', function (event) {
                 console.log(event.type);
+                console.log(event.target);
+
+                //webkit blink trident
+                var bodyTop = document.body.scrollTop;
+                console.log(bodyTop);
+
+                //gecko
+                var htmlTop = document.documentElement.scrollTop;
+                console.log(htmlTop);
+
             }, false);
 
+            var scrollDiv = document.querySelector('#scrollDiv');
+            scrollDiv.addEventListener('scroll', function (event) {
+                console.log("div scroll " + event.type);
+            }, false);
+
+            
+            window.addEventListener('error', function (event) {
+                console.log(event.type);
+            }, false);
+
+
+            document.querySelector('input[type=radio]').addEventListener('select', function (event) {
+                console.log(event.type);
+            },false);
+
+            document.querySelector('select').addEventListener('select', function (event) {
+                console.log(event.type);
+            },false);
 
 
         })();
