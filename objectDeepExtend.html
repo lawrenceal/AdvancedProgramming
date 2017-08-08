@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>object deep extend</title>
+</head>
+<body>
+    <script>
+        {
+            let isPlainObject = (obj) => {
+
+                if(!obj && Object.prototype.toString.call(obj) !== '[object Object]'){
+                    return false;
+                }
+
+                let proto = Object.getPrototypeOf(obj);
+
+                //Object.create(null)
+                if(!proto){
+                    return true;
+                }
+
+                let constructor = obj.hasOwnProperty('constructor') && obj.constructor;
+
+                return typeof constructor === 'function' && constructor === Object;
+            };
+
+            let extend = (target, ...args) => {
+
+                if(typeof target !== 'object' && typeof target !== 'function'){
+                    target = {};
+                }
+
+                for(let i = 0, len = args.length; i < len; i++){
+                    let option = args[i];
+
+                    if(option != null){
+
+                        for(let name of Object.keys(option)){
+                            let src = target[name],
+                                copy = option[name],
+                                copyIsArray = false;
+
+                            if(copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))){
+                                let clone = null;
+
+                                if(copyIsArray){
+                                    clone = Array.isArray(src) ? src : [];
+                                }else{
+                                    clone = isPlainObject(src) ? src : {};
+                                }
+
+                                target[name] = extend(clone, copy);
+                            }else if(copy !== undefined){
+                                target[name] = copy;
+                            }
+                        }
+                    }
+                }
+
+                return target;
+            };
+
+            let target = {name: 'lawrence', hobby: ['eat'], like: {name: 'kitty'}};
+
+            let result = extend(target, {age: 25, hobby: ['eat','sleep']}, {sex: 'men', like: {name: 'larry'}});
+
+            console.log(result);
+        }
+    </script>
+</body>
+</html>
