@@ -21,6 +21,23 @@
         console.log(window.opera);//undefined
 
 
+        function getBrowser(){
+            var ua = navigator.userAgent;
+
+            if(ua.includes('OPR')){
+                return 'Opera';
+            }else if(ua.includes('Chrome')){
+                return 'Chrome';
+            }else if(ua.includes('Safari')){
+                return 'Safari';
+            }else if(ua.includes('Gecko')){
+                return 'Firefox';
+            }else if(ua.includes('Edge')){
+                return 'IE';
+            }
+        }
+
+        console.log('current browser = ' + getBrowser());
 
     </script>
 </body>
