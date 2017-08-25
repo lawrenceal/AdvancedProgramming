@@ -139,7 +139,7 @@
 
 
             //计算的样式  getComputedStyle 计算样式都是只读，包含的默认样式可能因浏览器不同
-            //TODO 测试最新IE11支持getComputedStyle，但是不支持currentStyle
+                //TODO 测试最新IE11支持getComputedStyle，但是不支持currentStyle
             console.log();
             let calStyle = document.defaultView.getComputedStyle(div2, null);
             console.log(calStyle);
@@ -154,11 +154,13 @@
             //偏移量 只读 实时计算的
 
             /** HTMLElement.offsetParent 是一个只读属性，返回一个指向最近的（closest，指包含层级上的最近）包含该元素的定位元素。
-            如果没有定位的元素，则 offsetParent 为最近的 table 元素对象或根元素（标准模式下为 html；quirks 模式下为 body）。
+            如果没有定位的元素，则 offsetParent 为最近的 table 元素对象或根元素（标准模式下为 html；quirks 模式下为 body）。  现在为body?
             当元素的 style.display 设置为 "none" 时，offsetParent 返回 null。*/
 
             let cell = document.querySelector("#cell");
             console.log(cell.offsetParent);
+
+            //包含border padding content
             console.log("offsetHeight = " + cell.offsetHeight);
             console.log("offsetWidth = " + cell.offsetWidth);
             console.log("offsetLeft = " + cell.offsetLeft);
@@ -218,7 +220,7 @@
             console.log(getElementTop(cell));
 
 
-            //客户区大小 不包含边框滚动条 只读 实时计算的
+            //客户区大小 不包含边框滚动条 包含content padding 只读实时计算的
             console.log("clientWidth = " + cell.clientWidth);
             console.log("clientHeight = " + cell.clientHeight);
 
