@@ -8,8 +8,11 @@
     <script>
         {
             let isPlainObject = (obj) => {
+                if(!obj){
+                    return false;
+                }
 
-                if(!obj && Object.prototype.toString.call(obj) !== '[object Object]'){
+                if(Object.prototype.toString.call(obj) !== '[object Object]'){
                     return false;
                 }
 
@@ -66,6 +69,7 @@
             let result = extend(target, {age: 25, hobby: ['eat','sleep']}, {sex: 'men', like: {name: 'larry'}});
 
             console.log(result);
+
         }
     </script>
 </body>
