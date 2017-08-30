@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Web Worker</title>
+</head>
+<body>
+    <script>
+
+        var worker = new Worker('static/web-worker-task.js');
+
+        worker.postMessage({
+            id: 1,
+            message: 'hello world'
+        });
+
+        worker.onmessage = function(event){
+            console.log(event.data);
+            worker.terminate();
+        };
+
+        worker.onerror = function(error){
+            console.log(error.filename, error.lineno, error.message);
+        };
+
+
+    </script>
+</body>
+</html>
