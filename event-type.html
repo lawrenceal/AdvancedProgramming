@@ -308,8 +308,8 @@
             document.addEventListener('contextmenu', function (event) {
                 event.preventDefault();
 
-                contextMenu.style.left = event.clientX + 'px';
-                contextMenu.style.top = event.clientY + 'px';
+                contextMenu.style.left = event.pageX + 'px';
+                contextMenu.style.top = event.pageY + 'px';
                 contextMenu.style.display = 'block';
             }, false);
 
@@ -320,12 +320,13 @@
             }, false);
 
 
-           /* window.addEventListener('beforeunload', function(event){
+           /* //chrome 关闭不触发刷新触发
+            window.addEventListener('beforeunload', function(event){
 
-                //字符无用
-                event.returnValue = 'hello world';
-                return 'hello world';
-            }, false);*/
+                //TODO 字符无用
+                event.returnValue = 'hello world 1';
+                return 'hello world 1';
+             }, false);*/
 
            //形成完整的DOM树就触发
             document.addEventListener('DOMContentLoaded', function(event){
