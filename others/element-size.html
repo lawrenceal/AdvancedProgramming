@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>element size</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        .box{
+            height: 1000px;
+            background-color: #2fcfb8;
+        }
+
+
+        .inner-box{
+            position: absolute;
+            left: 30px;
+            top: 200px;
+        }
+
+        .cell{
+            width: 50px;
+            height: 50px;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid red;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="inner-box">
+            <div class="cell" id="cell"></div>
+        </div>
+    </div>
+    <!--<div style="height: 500px"></div>-->
+    <script>
+
+        console.log("document.compatMode = " + document.compatMode);
+
+        console.log("window.innerHeight = " + window.innerHeight);
+
+        console.log('document.documentElement.clientHeight = ' + document.documentElement.clientHeight);
+        console.log('document.body.clientHeight = ' + document.body.clientHeight);
+        //一个为视口高度，一个为文档高度，模式不同，交替切换
+        let getViewPort = () => {
+            if(document.compatMode === 'CSS1Compat'){
+                return {
+                    height: document.documentElement.clientHeight,
+                    width: document.documentElement.clientWidth
+                }
+            }else{
+                return {
+                    height: document.body.clientHeight,
+                    width: document.body.clientWidth
+                }
+            }
+        };
+        console.log('view port height = ' + getViewPort().height);
+
+
+        //文档高度
+        //内容大小小于视口大小，为视口大小,大于视口大小，为文档大小，混杂模式FF为实际内容大小
+        console.log('document.documentElement.scrollHeight = ' + document.documentElement.scrollHeight);
+        //大于视口高度同上相等，小于视口高度为实际内容高度 混杂模式为视口大小。
+        console.log('document.body.scrollHeight = ' + document.body.scrollHeight);
+        //TODO 内容小于视口，获取的是视口大小
+        let getDocumentHeight = () => {
+            return Math.max(document.documentElement.clientHeight, document.documentElement.scrollHeight);
+        };
+        console.log('document height = ' + getDocumentHeight());
+
+
+        console.log("document.documentElement.scrollTop = " + document.documentElement.scrollTop);
+        console.log("document.body.scrollTop = " + document.body.scrollTop);
+        let getScrollTop = () => {
+            return document.body.scrollTop || document.documentElement.scrollTop;
+        };
+        console.log('scroll top = ' + getScrollTop());
+
+
+        let cellEle = document.getElementById('cell');
+
+        console.log('client width = ' + cellEle.clientWidth);
+        console.log('offset width = ' + cellEle.offsetWidth);
+        console.log('getBoundingClientRect width = ' + (cellEle.getBoundingClientRect().right - cellEle.getBoundingClientRect().left));
+
+        console.log('offsetTop = ' + cellEle.offsetTop);
+        console.log('getBoundingClientRect top = ' + cellEle.getBoundingClientRect().top);
+
+        let getOffsetTop = (ele) => {
+            let actualTop = ele.offsetTop;
+
+            while (ele = ele.offsetParent){
+                actualTop += ele.offsetTop;
+            }
+
+            return actualTop;
+        };
+
+        console.log('actual offset top = ' + getOffsetTop(cellEle));
+
+
+    </script>
+</body>
+</html>
