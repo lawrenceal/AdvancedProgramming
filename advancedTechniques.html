@@ -316,6 +316,87 @@
         //自定义事件
         (() => {
 
+            function EventTarget (){
+                this.handlers = {};
+            }
+
+            EventTarget.prototype = {
+                constructor: EventTarget,
+                addHandler: function(type, handler){
+                    if(typeof this.handlers[type] == 'undefined'){
+                        this.handlers[type] = [];
+                    }
+
+                    this.handlers[type].push(handler);
+                },
+                fire: function(event){
+                    if(!event.target){
+                        event.target = this;
+                    }
+
+                    if(Array.isArray(this.handlers[event.type])){
+                        var handlers = this.handlers[event.type];
+                        handlers.forEach(function(handler){
+                            handler(event);
+                        });
+                    }
+                },
+                removeHandler: function(type, handler){
+                    var handlers = this.handlers[type];
+
+                    if(Array.isArray(handlers)){
+
+                        for(var i = 0, len = handlers.length; i < len; i++){
+                            if(handlers[i] === handler){
+                                break;
+                            }
+                        }
+
+                        handlers.splice(i, 1);
+                    }
+                }
+            };
+
+            var event = new EventTarget();
+
+            function handler(event){
+                console.log('自定义事件 ' + event.type + ":" + event.message);
+            }
+
+            event.addHandler('message', handler);
+
+            event.fire({type: 'message', message: 'hi'});
+
+
+            function Person(name, age){
+                this.name = name;
+                this.age = age;
+                EventTarget.call(this);
+            }
+
+            function inheritPrototype(sub, sup){
+                var prototype = Object.create(sup.prototype);
+                prototype.constructor = sub;
+                sub.prototype = prototype;
+            }
+
+            inheritPrototype(Person, EventTarget);
+
+            //Person.prototype = new EventTarget();
+
+            Person.prototype.say = function(message){
+                this.fire({'type': 'message', 'message': message});
+            };
+
+            var person = new Person('kitty', 23);
+
+            function handlerMessage(event){
+                console.log('' + event.target.name + ' say :' + event.message + ' my age is ' + event.target.age);
+            }
+
+            person.addHandler('message', handlerMessage);
+
+            person.say('hello ');
 
 
         })();
